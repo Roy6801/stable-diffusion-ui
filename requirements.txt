@@ -1,0 +1,5 @@
+diffusers==0.19.3
+fastapi==0.101.0
+python-dotenv==1.0.0
+torch==2.0.1
+uvicorn==0.23.2
