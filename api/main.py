@@ -10,11 +10,14 @@ import os
 
 load_dotenv(find_dotenv())
 
-auth_token = os.getenv("AUTH_TOKEN")
+auth_token = os.getenv("HUGGINGFACE_AUTH_TOKEN")
+
+model_id = None
+device = "cuda"
+pipe = None
 
 app = FastAPI()
 
-CURRENT_MODEL = None
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,33 +27,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# device = "cuda"
-# model_id = "runwayml/stable-diffusion-v1-5"
-# pipe = StableDiffusionPipeline.from_pretrained(
-#     model_id,
-#     revision="fp16",
-#     torch_dtype=torch.float16,
-#     use_auth_token=auth_token,
-#     cache_dir="models",
-#     use_safetensors=True,
-# )
-# pipe.to(device)
-
 
 @app.post("/load_model")
-def load_model(model_id: str):
-    CURRENT_MODEL = model_id
+def load_model(model_id: str, revision: str = "fp16"):
+    global pipe
+    pipe = StableDiffusionPipeline.from_pretrained(
+        model_id,
+        revision=revision,
+        torch_dtype=torch.float16,
+        use_auth_token=auth_token,
+        cache_dir="models",
+        safety_checker=None,
+    )
+    pipe.enable_xformers_memory_efficient_attention()
+    pipe.enable_sequential_cpu_offload()
+    pipe.enable_attention_slicing("max")
+    pipe = pipe.to(device)
     return model_id
 
 
-# @app.post("/generate")
-# def generate(prompt: str):
-#     with autocast(device):
-#         image = pipe(prompt, guidance_scale=8.5).images[0]
+@app.post("/generate")
+def generate(
+    prompt: str,
+    negative_prompt: str,
+    guidance_scale: float,
+    num_inference_steps: int = 50,
+):
+    global pipe
+    with autocast(device):
+        image = pipe(
+            prompt,
+            negative_prompt=negative_prompt,
+            guidance_scale=guidance_scale,
+            num_inference_steps=num_inference_steps,
+        ).images[0]
 
-#     # image.save("testimage.png")
-#     buffer = BytesIO()
-#     image.save(buffer, format="PNG")
-#     imgstr = base64.b64encode(buffer.getvalue())
+        image.save("testimage.png")
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")
+        imgstr = base64.b64encode(buffer.getvalue())
 
-#     return Response(content=imgstr, media_type="image/png")
+        return Response(content=imgstr, media_type="image/png")
