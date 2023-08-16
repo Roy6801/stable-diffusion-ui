@@ -39,9 +39,6 @@ def load_model(model_id: str, revision: str = "fp16"):
         cache_dir="models",
         safety_checker=None,
     )
-    pipe.enable_xformers_memory_efficient_attention()
-    pipe.enable_sequential_cpu_offload()
-    pipe.enable_attention_slicing("max")
     pipe = pipe.to(device)
     return model_id
 
