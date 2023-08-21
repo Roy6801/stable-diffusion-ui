@@ -1,10 +1,10 @@
-import Prompt from "@/components/Prompt";
+import Parameters from "@/components/Parameters";
 import Feed from "@/components/Feed";
 
 const Home = () => {
   return (
-    <main className="flex min-h-screen items-center justify-between bg-yellow-100">
-      <Prompt />
+    <main className="h-screen w-screen flex flex-col md:flex-row">
+      <Parameters />
       <Feed />
     </main>
   );
