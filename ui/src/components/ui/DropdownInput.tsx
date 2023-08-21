@@ -1,73 +1,80 @@
 "use client";
 
-import { useState } from "react";
-import { createStyles, UnstyledButton, Menu, rem } from "@mantine/core";
+import { useState, useEffect, useRef } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
+import { twMerge } from "tailwind-merge";
 
-const useStyles = createStyles((theme, { opened }: { opened: boolean }) => ({
-  control: {
-    width: rem(200),
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-    borderRadius: theme.radius.md,
-    border: `${rem(1)} solid ${
-      theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[2]
-    }`,
-    transition: "background-color 150ms ease",
-    backgroundColor:
-      theme.colorScheme === "dark"
-        ? theme.colors.dark[opened ? 5 : 6]
-        : opened
-        ? theme.colors.gray[0]
-        : theme.white,
-
-    "&:hover": {
-      backgroundColor:
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[5]
-          : theme.colors.gray[0],
-    },
-  },
-
-  label: {
-    fontWeight: 500,
-    fontSize: theme.fontSizes.sm,
-  },
-
-  icon: {
-    transition: "transform 150ms ease",
-    transform: opened ? "rotate(180deg)" : "rotate(0deg)",
-  },
-}));
-
-const DropdownInput = ({ data }: { data: string[] }) => {
+const DropdownInput = ({
+  data,
+  placeholder = "",
+  className,
+}: {
+  data: string[];
+  placeholder?: string;
+  className?: string;
+}) => {
   const [opened, setOpened] = useState(false);
-  const { classes } = useStyles({ opened });
-  const [selected, setSelected] = useState(data[0]);
+  const [selected, setSelected] = useState(placeholder);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(e.target as Node)
+    ) {
+      setOpened(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   const items = data.map((item) => (
-    <Menu.Item onClick={() => setSelected(item)} key={item}>
+    <div
+      key={item}
+      className={twMerge(
+        "p-2 mr-2 rounded-md hover:pl-4 hover:bg-zinc-700 active:bg-zinc-900",
+        `${selected === item && "pl-4 bg-zinc-900"}`
+      )}
+      onClick={(e) => setSelected(item)}
+    >
       {item}
-    </Menu.Item>
+    </div>
   ));
 
   return (
-    <Menu
-      onOpen={() => setOpened(true)}
-      onClose={() => setOpened(false)}
-      radius="md"
-      width="target"
-      withinPortal
-    >
-      <Menu.Target>
-        <UnstyledButton className={classes.control}>
-          <span className={classes.label}>{selected}</span>
-          <IconChevronDown size="1rem" className={classes.icon} stroke={1.5} />
-        </UnstyledButton>
-      </Menu.Target>
-      <Menu.Dropdown>{items}</Menu.Dropdown>
-    </Menu>
+    <div className={twMerge("relative", className)} ref={dropdownRef}>
+      <button
+        className="w-full rounded-sm text-md font-bold text-amber-200 hover:text-black hover:drop-shadow-lg bg-gradient-to-br hover:bg-gradient-to-tl from-amber-500 to-amber-200 p-[1px]"
+        onClick={(e) => setOpened(!opened)}
+      >
+        <div
+          className={twMerge(
+            "flex items-center justify-center bg-zinc-900 hover:bg-gradient-to-tl from-amber-500 to-amber-200 rounded-sm h-full px-0 py-2 flex-1",
+            `${
+              opened &&
+              "bg-gradient-to-tl from-amber-500 to-amber-200 text-black"
+            }`
+          )}
+        >
+          <div className="w-5/6 px-2 mx-1">{selected}</div>
+          <IconChevronDown
+            className={`transition-transform duration-300 ${
+              opened && "rotate-180"
+            }`}
+          />
+        </div>
+      </button>
+      {opened && (
+        <div className="absolute left-0 top-full w-full z-10 rounded-md mt-3 p-2 bg-zinc-800 text-amber-400 text-sm">
+          <div className="w-full max-h-[200px] scrollbar">{items}</div>
+        </div>
+      )}
+    </div>
   );
 };
 

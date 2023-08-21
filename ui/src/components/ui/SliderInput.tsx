@@ -45,8 +45,8 @@ const SliderInput = ({
         className=""
         classNames={{
           input:
-            "h-auto pt-5 pb-1 rounded-b-none border-slate-600 bg-slate-600 text-white",
-          label: "absolute pointer-events-none z-[1] p-2 text-white",
+            "h-auto pt-5 pb-1 rounded-b-none border-0 focus:border-amber-200 bg-zinc-900 text-amber-100 font-semibold",
+          label: "absolute pointer-events-none z-[1] p-2 text-amber-200",
         }}
       />
       <Slider
@@ -56,10 +56,11 @@ const SliderInput = ({
         label={null}
         value={value}
         onChange={setValue}
+        color="yellow"
         size={1}
         radius={0}
         className="absolute w-full -bottom-[1px]"
-        classNames={{ thumb: "w-4 h-4" }}
+        classNames={{ thumb: "w-4 h-4", track: "ml-2 mr-5" }}
       />
     </div>
   );

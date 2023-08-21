@@ -16,7 +16,7 @@ const useStyles = createStyles((theme) => ({
   label: {
     "&, &:hover": {
       "&[data-active]": {
-        color: theme.white,
+        color: theme.black,
       },
     },
   },
@@ -37,11 +37,11 @@ const SegmentInput = ({
       data={data}
       className={className}
       classNames={{
-        root: "bg-slate-500",
-        indicator: "bg-gradient-to-br from-teal-100 to-teal-600",
+        root: "bg-zinc-900 border-[1px] border-amber-300",
+        indicator: "bg-gradient-to-tl from-amber-500 to-amber-200",
         control: classes.control,
         label: twMerge(
-          "text-gray-300 hover:text-white data-text-teal-500",
+          "text-amber-400 hover:text-amber-200 hover:drop-shadow-lg shadow-amber-200",
           classes.label
         ),
       }}

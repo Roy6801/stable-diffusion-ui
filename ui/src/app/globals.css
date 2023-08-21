@@ -16,6 +16,20 @@
   }
 }
 
+@layer {
+  .scrollbar {
+    @apply overflow-y-scroll;
+  }
+
+  .scrollbar::-webkit-scrollbar {
+    @apply w-1 md:w-2;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-tl from-amber-500 to-amber-200 rounded-md m-1;
+  }
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
