@@ -1,20 +1,18 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import torch
-from torch import autocast
-from diffusers import StableDiffusionPipeline
-from io import BytesIO
-import base64
-from dotenv import find_dotenv, load_dotenv
-import os
+from fastapi_restful import Api
+from src.handlers import *
+import json
 
-load_dotenv(find_dotenv())
 
-auth_token = os.getenv("HUGGINGFACE_AUTH_TOKEN")
+try:
+    with open("src/config.json", "r") as fr:
+        config = json.load(fr)
+except:
+    raise Exception("Config File could not be loaded!")
 
-model_id = None
-device = "cuda"
-pipe = None
+
+shared_context = {"pipe": None, "device": "cuda", "config": config}
 
 app = FastAPI()
 
@@ -27,41 +25,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.post("/load_model")
-def load_model(model_id: str, revision: str = "fp16"):
-    global pipe
-    pipe = StableDiffusionPipeline.from_pretrained(
-        model_id,
-        revision=revision,
-        torch_dtype=torch.float16,
-        use_auth_token=auth_token,
-        cache_dir="models",
-        safety_checker=None,
-    )
-    pipe = pipe.to(device)
-    return model_id
+api = Api(app)
+load_model_ = LoadModel(shared_context)
+txt2img_ = Txt2Img(shared_context)
 
 
-@app.post("/generate")
-def generate(
-    prompt: str,
-    negative_prompt: str,
-    guidance_scale: float,
-    num_inference_steps: int = 50,
-):
-    global pipe
-    with autocast(device):
-        image = pipe(
-            prompt,
-            negative_prompt=negative_prompt,
-            guidance_scale=guidance_scale,
-            num_inference_steps=num_inference_steps,
-        ).images[0]
-
-        image.save("testimage.png")
-        buffer = BytesIO()
-        image.save(buffer, format="PNG")
-        imgstr = base64.b64encode(buffer.getvalue())
-
-        return Response(content=imgstr, media_type="image/png")
+api.add_resource(load_model_, "/load_model")
+api.add_resource(txt2img_, "/txt2img")

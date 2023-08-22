@@ -1,0 +1,4 @@
+{
+  "models": ["runwayml/stable-diffusion-v1-5"],
+  "active": "runwayml/stable-diffusion-v1-5"
+}
