@@ -1,5 +1,7 @@
-const Feed = () => {
-  return <main className="bg-zinc-950 flex-1"></main>;
+import { twMerge } from "tailwind-merge";
+
+const Feed = ({ className = "" }: { className?: string }) => {
+  return <main className={twMerge("flex-1", className)}></main>;
 };
 
 export default Feed;

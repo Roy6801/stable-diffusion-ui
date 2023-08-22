@@ -42,11 +42,11 @@ const SliderInput = ({
         min={min}
         max={max}
         hideControls
-        className=""
         classNames={{
           input:
             "h-auto pt-5 pb-1 rounded-b-none border-0 focus:border-amber-200 bg-zinc-900 text-amber-100 font-semibold",
-          label: "absolute pointer-events-none z-[1] p-2 text-amber-200",
+          label:
+            "absolute pointer-events-none z-[1] p-2 text-amber-200 whitespace-nowrap",
         }}
       />
       <Slider
