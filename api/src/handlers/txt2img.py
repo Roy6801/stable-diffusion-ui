@@ -1,4 +1,4 @@
-from fastapi import Response
+from fastapi import HTTPException
 from fastapi_restful import Resource
 
 
@@ -22,8 +22,8 @@ class Txt2Img(Resource):
                 num_inference_steps,
             )
             return model_id
-        except:
-            raise Exception("Load Model Error")
+        except Exception as e:
+            raise HTTPException(500, str(e))
 
 
 import torch
