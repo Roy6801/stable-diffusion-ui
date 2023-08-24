@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from fastapi_restful import Resource
 
 
@@ -9,8 +10,8 @@ class LoadScheduler(Resource):
         try:
             load_scheduler(self.__shared_context, scheduler_id)
             return self.__shared_context["scheduler_name"]
-        except:
-            raise Exception("Load Scheduler Error")
+        except Exception as e:
+            raise HTTPException(500, str(e))
 
 
 import diffusers
@@ -23,7 +24,7 @@ def load_scheduler(shared_context: dict, scheduler_id: str = ""):
     scheduler_id = scheduler_id.lower().strip()
     if scheduler_id == "":
         scheduler_id = "ddim"
-    
+
     scheduler_name = schedulers[scheduler_id]
     scheduler_model = getattr(diffusers, scheduler_name)
 

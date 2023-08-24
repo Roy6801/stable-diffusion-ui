@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from fastapi_restful import Resource
 
 
@@ -9,8 +10,8 @@ class LoadModel(Resource):
         try:
             load_model(self.__shared_context, model_id)
             return model_id
-        except:
-            raise Exception("Load Model Error")
+        except Exception as e:
+            raise HTTPException(500, str(e))
 
 
 from diffusers import StableDiffusionPipeline
