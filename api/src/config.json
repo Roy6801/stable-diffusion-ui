@@ -1,4 +1,33 @@
 {
-  "models": ["runwayml/stable-diffusion-v1-5"],
-  "active": "runwayml/stable-diffusion-v1-5"
+  "models": {
+    "lykon/dreamshaper": {
+      "revision": "main",
+      "model_name": "dreamshaper",
+      "author": "lykon"
+    }
+  },
+  "scheduler": {
+    "config": {
+      "_class_name": "PNDMScheduler",
+      "_diffusers_version": "0.8.0.dev0",
+      "beta_end": 0.012,
+      "beta_schedule": "scaled_linear",
+      "beta_start": 0.00085,
+      "clip_sample": false,
+      "num_train_timesteps": 1000,
+      "set_alpha_to_one": false,
+      "skip_prk_steps": true,
+      "steps_offset": 1,
+      "trained_betas": null
+    },
+    "models": {
+      "ddim": "DDIMScheduler",
+      "ddpm": "DDPMScheduler",
+      "kdpm2": "KDPM2DiscreteScheduler",
+      "euler": "EulerDiscreteScheduler",
+      "euler a": "EulerAncestralDiscreteScheduler",
+      "lmsd": "LMSDiscreteScheduler",
+      "pndm": "PNDMScheduler"
+    }
+  }
 }

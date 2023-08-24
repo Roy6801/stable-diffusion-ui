@@ -26,9 +26,16 @@ class Txt2Img(Resource):
             raise Exception("Load Model Error")
 
 
-from io import BytesIO
+import torch
 from torch import autocast
+from io import BytesIO
 import base64
+
+
+def get_base64(image):
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue())
 
 
 def txt2img(
@@ -37,21 +44,43 @@ def txt2img(
     negative_prompt: str,
     guidance_scale: float = 7.5,
     num_inference_steps: int = 50,
+    seed: int = -1,
 ):
     device = shared_context["device"]
     pipe = shared_context["pipe"]
 
+    def progress(step, timestep, latents):
+        with torch.no_grad():
+            latents = 1 / 0.18215 * latents
+            images = pipe.vae.decode(latents).sample
+
+            images = (images / 2 + 0.5).clamp(0, 1)
+
+            # we always cast to float32 as this does not cause significant overhead and is compatible with bfloa16
+            images = images.cpu().permute(0, 2, 3, 1).float().numpy()
+
+            # convert to PIL Images
+            images = pipe.numpy_to_pil(images)
+
+            # do something with the Images
+            for image in images:
+                get_base64(image)
+
     with autocast(device):
-        image = pipe(
+        results = pipe(
             prompt,
             negative_prompt=negative_prompt,
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
-        ).images[0]
+            callback=progress,
+            callback_steps=5,
+        ).images
 
-        image.save("testimage.png")
-        buffer = BytesIO()
-        image.save(buffer, format="PNG")
-        imgstr = base64.b64encode(buffer.getvalue())
+        images = []
 
-        return Response(content=imgstr, media_type="image/png")
+        for ind, image in enumerate(results):
+            image.save(f"testimage{ind}.png")
+            imgstr = get_base64(image)
+            images.append(imgstr)
+
+        return images
