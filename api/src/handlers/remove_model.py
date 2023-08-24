@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from fastapi_restful import Resource
 
 
@@ -9,8 +10,8 @@ class RemoveModel(Resource):
         try:
             remove_model(self.__shared_context, model_id)
             return model_id
-        except:
-            raise Exception("Remove Model Error")
+        except Exception as e:
+            raise HTTPException(500, str(e))
 
 
 from src.utils import CONFIG_FILE, MODEL_DIR

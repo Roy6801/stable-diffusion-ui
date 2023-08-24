@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from fastapi_restful import Resource
 
 
@@ -8,8 +9,8 @@ class GetModels(Resource):
     async def get(self):
         try:
             return get_models(self.__shared_context)
-        except:
-            raise Exception("Get Models Error")
+        except Exception as e:
+            raise HTTPException(500, str(e))
 
 
 def get_models(shared_context):
