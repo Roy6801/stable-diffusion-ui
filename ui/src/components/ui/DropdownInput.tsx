@@ -63,7 +63,7 @@ const DropdownInput = ({
         >
           <div className="w-5/6 px-2 mx-1">{selected}</div>
           <IconChevronDown
-            className={`transition-transform duration-300 ${
+            className={`transition-transform duration-300 w-1/6 ${
               opened && "rotate-180"
             }`}
           />
@@ -71,7 +71,9 @@ const DropdownInput = ({
       </button>
       {opened && (
         <div className="absolute left-0 top-full w-full z-10 rounded-md mt-3 p-2 bg-zinc-800 text-amber-400 text-sm">
-          <div className="w-full max-h-[200px] scrollbar">{items}</div>
+          <div className="w-full max-h-[200px] scrollbar overflow-x-hidden">
+            {items}
+          </div>
         </div>
       )}
     </div>

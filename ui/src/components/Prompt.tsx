@@ -11,12 +11,12 @@ const Prompt = ({ className = "" }: { className?: string }) => {
       )}
     >
       <TextArea
-        className="w-full lg:w-2/5 m-2 min-h-[80px]"
+        className="w-full lg:w-2/5 m-2 min-h-[80px] text-md"
         placeholder="Prompt"
         maxHeight="200px"
       />
       <TextArea
-        className="w-full lg:w-2/5 m-2 min-h-[80px]"
+        className="w-full lg:w-2/5 m-2 min-h-[80px] text-md"
         placeholder="Negative Prompt"
         maxHeight="200px"
       />

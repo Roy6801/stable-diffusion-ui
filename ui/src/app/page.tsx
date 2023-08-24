@@ -19,9 +19,12 @@ const Home = () => {
         )}
       >
         <div className="flex w-full items-center justify-between lg:justify-center px-5 py-10">
-          <span className="text-lg lg:text-xl font-bold font-mono">
-            Stable Diffusion UI
-          </span>
+          <div className="flex items-center justify-center">
+            <span className="text-lg lg:text-xl font-bold font-mono mx-1">
+              Stable Diffusion UI
+            </span>
+            <span className="text-sm font-light font-mono mx-1">(v1.0)</span>
+          </div>
           <div
             onClick={(e) => setMenu(!menu)}
             className={`transition-transform duration-300 lg:hidden ${
