@@ -90,12 +90,20 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         </div>
       </div>
 
-      <Link
-        href="/more"
-        className="underline underline-offset-8 mt-4 hover:text-amber-300 active:text-amber-500"
-      >
-        More
-      </Link>
+      <div className="flex w-full md:w-3/4 lg:w-full mt-8 items-center justify-around">
+        <Link
+          href="/gallery"
+          className="underline underline-offset-8 text-amber-400 hover:text-amber-300 active:text-amber-500"
+        >
+          Image Gallery
+        </Link>
+        <Link
+          href="/settings"
+          className="underline underline-offset-8 text-amber-400 hover:text-amber-300 active:text-amber-500"
+        >
+          Settings
+        </Link>
+      </div>
     </main>
   );
 };
