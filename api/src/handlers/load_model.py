@@ -16,7 +16,9 @@ class LoadModel(Resource):
 
 from diffusers import StableDiffusionPipeline
 from dotenv import find_dotenv, load_dotenv
+from src.utils import CONFIG_FILE, MODEL_DIR
 import torch
+import json
 import os
 
 
@@ -27,10 +29,12 @@ auth_token = os.getenv("HUGGINGFACE_AUTH_TOKEN")
 def load_model(shared_context, model_id: str):
     model_id = model_id.lower().strip()
 
-    if model_id in shared_context["config"]["models"]:
+    config = shared_context["config"]
+
+    if model_id in config["models"]:
         device = shared_context["device"]
         scheduler = shared_context["scheduler"]
-        revision = shared_context["config"]["models"][model_id]["revision"]
+        revision = config["models"][model_id]["revision"]
 
         revision = revision.lower().strip()
 
@@ -47,6 +51,15 @@ def load_model(shared_context, model_id: str):
         pipe = pipe.to(device)
         shared_context["pipe"] = pipe
         shared_context["model_id"] = model_id
+
+        identifier = config["models"][model_id]["downloaded"]
+
+        if not config["models"][model_id]["downloaded"] and os.path.exists(
+            os.path.join(MODEL_DIR, identifier)
+        ):
+            config["models"][model_id]["downloaded"] = True
+            with open(CONFIG_FILE, "w") as fw:
+                json.dump(config, fw, indent=2)
 
         return model_id
     else:

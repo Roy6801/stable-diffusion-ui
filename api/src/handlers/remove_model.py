@@ -35,19 +35,14 @@ def clean_temp(directory_path):
             os.remove(os.path.join(directory_path, file_name))
 
 
-def model_identifier(model_id: str):
-    _id = "--".join(model_id.split("/"))
-    identifier = f"models--{_id}"
-    return identifier
-
-
 def remove_model(shared_context, model_id: str):
     config = shared_context["config"]
     model_id = model_id.lower().strip()
 
     if model_id in config["models"]:
+        identifier = config["models"][model_id]["identifier"]
         try:
-            model_dir = os.path.join(MODEL_DIR, model_identifier(model_id))
+            model_dir = os.path.join(MODEL_DIR, identifier)
             delete_directory(model_dir)
             clean_temp(MODEL_DIR)
         except:

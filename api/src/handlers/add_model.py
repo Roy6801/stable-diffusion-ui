@@ -18,17 +18,26 @@ from src.utils import CONFIG_FILE
 import json
 
 
+def model_identifier(model_id: str):
+    _id = "--".join(model_id.split("/"))
+    identifier = f"models--{_id}"
+    return identifier
+
+
 def add_model(shared_context, model_id: str, revision: str = "fp16"):
     config = shared_context["config"]
     model_id = model_id.lower().strip()
     revision = revision.lower().strip()
 
     if model_id not in config["models"]:
+        identifier = model_identifier(model_id)
         try:
             config["models"][model_id] = {
                 "revision": revision,
                 "model_name": model_id.split("/")[-1],
                 "author": model_id.split("/")[0],
+                "identifier": identifier,
+                "downloaded": False,
             }
             with open(CONFIG_FILE, "w") as fw:
                 json.dump(config, fw, indent=2)
