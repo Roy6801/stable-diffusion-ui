@@ -3,7 +3,9 @@
     "lykon/dreamshaper": {
       "revision": "main",
       "model_name": "dreamshaper",
-      "author": "lykon"
+      "author": "lykon",
+      "identifier": "models--lykon--dreamshaper",
+      "downloaded": false
     }
   },
   "scheduler": {
