@@ -52,7 +52,7 @@ def load_model(shared_context, model_id: str):
         shared_context["pipe"] = pipe
         shared_context["model_id"] = model_id
 
-        identifier = config["models"][model_id]["downloaded"]
+        identifier = config["models"][model_id]["identifier"]
 
         if not config["models"][model_id]["downloaded"] and os.path.exists(
             os.path.join(MODEL_DIR, identifier)
