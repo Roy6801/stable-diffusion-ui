@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { NumberInput, Slider } from "@mantine/core";
 import { twMerge } from "tailwind-merge";
 
@@ -11,6 +8,8 @@ interface SliderProps {
   step: number;
   label: string;
   placeholder: string;
+  state?: number;
+  setState?: (val: number | ((prevState: number) => number)) => void;
   className?: string;
 }
 
@@ -21,19 +20,20 @@ const SliderInput = ({
   step = 10,
   label = "",
   placeholder = "",
+  state = 0,
+  setState = () => {},
   className = "",
 }: SliderProps) => {
-  const [value, setValue] = useState<number>(defaultValue);
-
   return (
     <div className={twMerge("relative", className)}>
       <NumberInput
-        value={value}
+        defaultValue={defaultValue}
+        value={state ? state : 0}
         onChange={(val) => {
-          if (typeof val !== "number") {
-            setValue(0);
+          if (val !== "") {
+            setState(val);
           } else {
-            setValue(val);
+            setState(0);
           }
         }}
         label={label}
@@ -54,8 +54,8 @@ const SliderInput = ({
         step={step}
         min={min}
         label={null}
-        value={value}
-        onChange={setValue}
+        value={state}
+        onChange={setState}
         color="yellow"
         size={1}
         radius={0}

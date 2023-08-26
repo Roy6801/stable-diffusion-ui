@@ -4,15 +4,17 @@ import { useState, useEffect, useRef } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { twMerge } from "tailwind-merge";
 
+interface DropdownProps {
+  data: string[];
+  placeholder?: string;
+  className?: string;
+}
+
 const DropdownInput = ({
   data,
   placeholder = "",
   className,
-}: {
-  data: string[];
-  placeholder?: string;
-  className?: string;
-}) => {
+}: DropdownProps) => {
   const [opened, setOpened] = useState(false);
   const [selected, setSelected] = useState(placeholder);
   const dropdownRef = useRef<HTMLDivElement | null>(null);

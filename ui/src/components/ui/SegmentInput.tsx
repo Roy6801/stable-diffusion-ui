@@ -1,5 +1,3 @@
-"use client";
-
 import {
   createStyles,
   SegmentedControl,
@@ -22,16 +20,25 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+interface SegmentInputProps extends SegmentedControlProps {
+  state?: string;
+  setState?: (val: string | ((prevState: string) => string)) => void;
+}
+
 const SegmentInput = ({
   data,
   radius = "xl",
   size = "md",
+  state = "",
+  setState = () => {},
   className = "",
-}: SegmentedControlProps) => {
+}: SegmentInputProps) => {
   const { classes } = useStyles();
 
   return (
     <SegmentedControl
+      value={state}
+      onChange={setState}
       radius={radius}
       size={size}
       data={data}
