@@ -1,22 +1,24 @@
-import React, { FC, HTMLAttributes, useEffect, useState } from "react";
+import { FC, HTMLAttributes, useEffect, useState, ChangeEvent } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface TextAreaProps extends HTMLAttributes<HTMLTextAreaElement> {
   maxHeight?: string;
+  state?: string;
+  setState?: (val: string | ((prevState: string) => string)) => void;
 }
 
 const TextArea: FC<TextAreaProps> = ({
   className,
   maxHeight = "none", // Default value is "none"
+  state = "",
+  setState = () => {},
   ...props
 }) => {
-  const [value, setValue] = useState(""); // Initialize with an empty value
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { value, scrollHeight } = event.target;
 
     // Set the state value based on the textarea content
-    setValue(value);
+    setState(value);
 
     // Calculate and update the textarea's height based on the content
     event.target.style.height = "auto";
@@ -25,13 +27,13 @@ const TextArea: FC<TextAreaProps> = ({
 
   useEffect(() => {
     // Reset textarea height if the value becomes empty
-    if (value === "") {
+    if (state === "") {
       const textareas = document.querySelectorAll("textarea");
       textareas.forEach((textarea) => {
         textarea.style.height = "auto";
       });
     }
-  }, [value]);
+  }, [state]);
 
   return (
     <textarea
@@ -40,7 +42,7 @@ const TextArea: FC<TextAreaProps> = ({
         className
       )}
       onChange={handleInputChange}
-      value={value}
+      value={state}
       style={{ maxHeight }} // Apply the maxHeight style
       {...props}
     />
