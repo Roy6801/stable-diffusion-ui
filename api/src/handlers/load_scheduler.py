@@ -1,14 +1,19 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
+from pydantic import BaseModel
+
+
+class LoadSchedulerParams(BaseModel):
+    scheduler_id: str
 
 
 class LoadScheduler(Resource):
     def __init__(self, shared_context):
         self.__shared_context = shared_context
 
-    async def post(self, scheduler_id: str = ""):
+    async def post(self, data: LoadSchedulerParams):
         try:
-            load_scheduler(self.__shared_context, scheduler_id)
+            load_scheduler(self.__shared_context, data.scheduler_id)
             return self.__shared_context["scheduler_name"]
         except Exception as e:
             raise HTTPException(500, str(e))

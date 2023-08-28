@@ -9,10 +9,28 @@ import Button from "./ui/Button";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getRandomInt } from "@/utils/functions";
+import Loader from "./ui/Loader";
+
+interface ModelInfo {
+  revision: string;
+  model_name: string;
+  author: string;
+  identifier: string;
+  downloaded: boolean;
+}
+
+interface ModelMap {
+  [key: string]: ModelInfo;
+}
 
 const Parameters = ({ className = "" }: { className?: string }) => {
-  const [models, setModels] = useState<object>({});
+  const [model, setModel] = useState<string>("");
+  const [scheduler, setScheduler] = useState<string>("");
+
+  const [models, setModels] = useState<ModelMap>({});
   const [schedulers, setSchedulers] = useState<object>({});
+
+  const [loader, setLoader] = useState<boolean | string>(false);
 
   const [serverUrl, setServerUrl] = useLocalStorage({
     key: "server-url",
@@ -67,11 +85,13 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         cache: "no-store",
         headers: {
           "ngrok-skip-browser-warning": "true",
+          "Content-Type": "application/json",
         },
       })
         .then((res) => res.json())
         .then((res) => {
           setSchedulers(res);
+          setLoader(false);
         })
         .catch((err) => {
           console.log(err);
@@ -80,6 +100,57 @@ const Parameters = ({ className = "" }: { className?: string }) => {
     }
   }, [serverUrl]);
 
+  useEffect(() => {
+    if (serverUrl !== "" && model !== "") {
+      console.log(model);
+      const url = serverUrl.replace("localhost", "127.0.0.1");
+
+      setLoader(models[model]["downloaded"] ? true : "Downloading");
+
+      fetch(`${url}/load_model`, {
+        cache: "no-store",
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ tag: model }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res);
+          setLoader(false);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [model]);
+
+  useEffect(() => {
+    if (serverUrl !== "" && scheduler !== "") {
+      console.log(scheduler);
+      const url = serverUrl.replace("localhost", "127.0.0.1");
+
+      fetch(`${url}/load_scheduler`, {
+        cache: "no-store",
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ scheduler_id: scheduler.toLowerCase() }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [scheduler]);
+
   return (
     <main
       className={twMerge(
@@ -87,6 +158,7 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         className
       )}
     >
+      {loader && <Loader text={loader} />}
       <TextInput
         placeholder="Server URL"
         className="w-full md:w-3/4 lg:w-full mt-4 text-md py-6"
@@ -99,6 +171,8 @@ const Parameters = ({ className = "" }: { className?: string }) => {
           data={Object.keys(models)}
           className="w-1/2 mr-1 text-sm"
           placeholder="Model"
+          state={model}
+          setState={setModel}
         />
 
         <DropdownInput
@@ -107,6 +181,8 @@ const Parameters = ({ className = "" }: { className?: string }) => {
           )}
           className="w-1/2 ml-1 text-sm"
           placeholder="Scheduler"
+          state={scheduler}
+          setState={setScheduler}
         />
       </div>
 

@@ -63,74 +63,57 @@ const Settings = () => {
   };
 
   const handleAddModel = async () => {
-    const url = serverUrl.replace("localhost", "127.0.0.1");
-
-    const headers = {
-      "ngrok-skip-browser-warning": "true",
-      "Content-Type": "application/json",
-    };
-
-    const modelInfo: AddModelProps = {
-      tag: addModel,
-      revision: modelRevision,
-    };
-
-    const added = await (
-      await fetch(`${url}/add_model`, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(modelInfo),
-      })
-    ).json();
-
-    console.log(added);
-
-    fetchModels();
-  };
-
-  const handleRemoveModel = async () => {
-    const url = serverUrl.replace("localhost", "127.0.0.1");
-
-    const headers = {
-      "ngrok-skip-browser-warning": "true",
-      "Content-Type": "application/json",
-    };
-
-    const modelInfo: RemoveModelProps = {
-      tag: removeModel,
-    };
-
-    const removed = await (
-      await fetch(`${url}/remove_model`, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(modelInfo),
-      })
-    ).json();
-
-    console.log(removed);
-
-    fetchModels();
-  };
-
-  const handleDownloadModel = () => {
     if (serverUrl !== "") {
       const url = serverUrl.replace("localhost", "127.0.0.1");
 
-      fetch(`${url}/get_models`, {
-        cache: "no-store",
-        headers: {
-          "ngrok-skip-browser-warning": "true",
-        },
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          setModels(res);
+      const headers = {
+        "ngrok-skip-browser-warning": "true",
+        "Content-Type": "application/json",
+      };
+
+      const modelInfo: AddModelProps = {
+        tag: addModel,
+        revision: modelRevision,
+      };
+
+      const added = await (
+        await fetch(`${url}/add_model`, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(modelInfo),
         })
-        .catch((err) => {
-          console.log(err);
-          setModels({});
-        });
+      ).json();
+
+      console.log(added);
+
+      fetchModels();
+    }
+  };
+
+  const handleRemoveModel = async () => {
+    if (serverUrl !== "") {
+      const url = serverUrl.replace("localhost", "127.0.0.1");
+
+      const headers = {
+        "ngrok-skip-browser-warning": "true",
+        "Content-Type": "application/json",
+      };
+
+      const modelInfo: RemoveModelProps = {
+        tag: removeModel,
+      };
+
+      const removed = await (
+        await fetch(`${url}/remove_model`, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify(modelInfo),
+        })
+      ).json();
+
+      console.log(removed);
+
+      fetchModels();
     }
   };
 

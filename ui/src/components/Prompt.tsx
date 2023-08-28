@@ -3,7 +3,6 @@ import TextArea from "./ui/TextArea";
 import Button from "./ui/Button";
 import { useLocalStorage } from "@mantine/hooks";
 import { getRandomInt } from "@/utils/functions";
-import { MouseEventHandler } from "react";
 
 interface PromptProps {
   className?: string;
@@ -61,7 +60,10 @@ const Prompt = ({ className = "" }: PromptProps) => {
   });
 
   const handleGenerate = () => {
-    const url = serverUrl.replace("localhost", "127.0.0.1");
+    const url = serverUrl
+      .replace("localhost", "127.0.0.1")
+      .replace("http", "ws")
+      .replace("https", "wss");
 
     const prompt: Text2ImageProps = {
       prompt: positivePrompt,
@@ -73,7 +75,14 @@ const Prompt = ({ className = "" }: PromptProps) => {
       batch_size: Number.parseInt(imageCount),
     };
 
-    console.log(url, prompt);
+    console.log(prompt);
+
+    const socket = new WebSocket(url);
+
+    socket.onmessage = (event) => {
+      const imageBase64 = event.data;
+      console.log(imageBase64);
+    };
   };
 
   return (
