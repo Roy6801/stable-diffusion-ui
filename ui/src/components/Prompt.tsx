@@ -79,10 +79,20 @@ const Prompt = ({ className = "" }: PromptProps) => {
 
     const socket = new WebSocket(url);
 
-    socket.onmessage = (event) => {
-      const imageBase64 = event.data;
-      console.log(imageBase64);
-    };
+    socket.addEventListener("open", (event) => {
+      console.log("WebSocket connection opened", event);
+      // Send data to the server after connection is established
+      socket.send(JSON.stringify(prompt));
+    });
+
+    socket.addEventListener("message", (event) => {
+      console.log("Message from server:", event.data);
+      // Handle server responses or updates here
+    });
+
+    socket.addEventListener("error", (event) => {
+      console.error("WebSocket error:", event);
+    });
   };
 
   return (

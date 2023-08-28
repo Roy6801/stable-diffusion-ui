@@ -1,6 +1,7 @@
 from fastapi import WebSocket, WebSocketException, HTTPException
 from fastapi_restful import Resource
 from pydantic import BaseModel
+import json
 
 
 class Txt2ImgParams(BaseModel):
@@ -17,9 +18,11 @@ class Txt2Img(Resource):
     def __init__(self, shared_context):
         self.__shared_context = shared_context
 
-    async def post(self, data: Txt2ImgParams, websocket: WebSocket):
+    async def post(self, websocket: WebSocket):
         try:
             await websocket.accept()
+            data: Txt2ImgParams = json.loads(await websocket.receive_text())
+
             tag = await txt2img(
                 self.__shared_context,
                 websocket,
