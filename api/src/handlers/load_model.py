@@ -1,15 +1,20 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
+from pydantic import BaseModel
+
+
+class LoadModelParams(BaseModel):
+    tag: str
 
 
 class LoadModel(Resource):
     def __init__(self, shared_context):
         self.__shared_context = shared_context
 
-    async def post(self, model_id: str):
+    async def post(self, data: LoadModelParams):
         try:
-            load_model(self.__shared_context, model_id)
-            return model_id
+            load_model(self.__shared_context, data.tag)
+            return data.tag
         except Exception as e:
             raise HTTPException(500, str(e))
 
@@ -26,20 +31,20 @@ load_dotenv(find_dotenv())
 auth_token = os.getenv("HUGGINGFACE_AUTH_TOKEN")
 
 
-def load_model(shared_context, model_id: str):
-    model_id = model_id.lower().strip()
+def load_model(shared_context, tag: str):
+    tag = tag.lower().strip()
 
     config = shared_context["config"]
 
-    if model_id in config["models"]:
+    if tag in config["models"]:
         device = shared_context["device"]
         scheduler = shared_context["scheduler"]
-        revision = config["models"][model_id]["revision"]
+        revision = config["models"][tag]["revision"]
 
         revision = revision.lower().strip()
 
         pipe = StableDiffusionPipeline.from_pretrained(
-            model_id,
+            tag,
             revision=revision,
             torch_dtype=torch.float16,
             use_auth_token=auth_token,
@@ -50,17 +55,17 @@ def load_model(shared_context, model_id: str):
 
         pipe = pipe.to(device)
         shared_context["pipe"] = pipe
-        shared_context["model_id"] = model_id
+        shared_context["tag"] = tag
 
-        identifier = config["models"][model_id]["identifier"]
+        identifier = config["models"][tag]["identifier"]
 
-        if not config["models"][model_id]["downloaded"] and os.path.exists(
+        if not config["models"][tag]["downloaded"] and os.path.exists(
             os.path.join(MODEL_DIR, identifier)
         ):
-            config["models"][model_id]["downloaded"] = True
+            config["models"][tag]["downloaded"] = True
             with open(CONFIG_FILE, "w") as fw:
                 json.dump(config, fw, indent=2)
 
-        return model_id
+        return tag
     else:
         raise Exception("Model Not Found!")

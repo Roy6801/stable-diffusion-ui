@@ -1,15 +1,20 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
+from pydantic import BaseModel
+
+
+class RemoveModelParams(BaseModel):
+    tag: str
 
 
 class RemoveModel(Resource):
     def __init__(self, shared_context):
         self.__shared_context = shared_context
 
-    async def post(self, model_id: str):
+    async def post(self, data: RemoveModelParams):
         try:
-            remove_model(self.__shared_context, model_id)
-            return model_id
+            remove_model(self.__shared_context, data.tag)
+            return data.tag
         except Exception as e:
             raise HTTPException(500, str(e))
 
@@ -35,12 +40,12 @@ def clean_temp(directory_path):
             os.remove(os.path.join(directory_path, file_name))
 
 
-def remove_model(shared_context, model_id: str):
+def remove_model(shared_context, tag: str):
     config = shared_context["config"]
-    model_id = model_id.lower().strip()
+    tag = tag.lower().strip()
 
-    if model_id in config["models"]:
-        identifier = config["models"][model_id]["identifier"]
+    if tag in config["models"]:
+        identifier = config["models"][tag]["identifier"]
         try:
             model_dir = os.path.join(MODEL_DIR, identifier)
             delete_directory(model_dir)
@@ -49,7 +54,7 @@ def remove_model(shared_context, model_id: str):
             raise Exception("Failed to clean up Model Files!")
 
         try:
-            del config["models"][model_id]
+            del config["models"][tag]
             with open(CONFIG_FILE, "w") as fw:
                 json.dump(config, fw, indent=2)
         except:
@@ -57,4 +62,4 @@ def remove_model(shared_context, model_id: str):
     else:
         raise Exception("Model does Not Exist!")
 
-    return model_id
+    return tag

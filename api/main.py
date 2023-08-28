@@ -15,7 +15,7 @@ except:
 
 shared_context = {
     "pipe": None,
-    "model_id": "",
+    "tag": "",
     "scheduler": None,
     "scheduler_name": "",
     "device": "cuda",
