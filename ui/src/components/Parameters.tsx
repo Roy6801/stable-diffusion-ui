@@ -7,19 +7,16 @@ import { useLocalStorage } from "@mantine/hooks";
 import { twMerge } from "tailwind-merge";
 import Button from "./ui/Button";
 import Link from "next/link";
-
-function getRandomInt(min: number, max: number): number {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+import { useState, useEffect } from "react";
+import { getRandomInt } from "@/utils/functions";
 
 const Parameters = ({ className = "" }: { className?: string }) => {
-  const models = ["compvis", "swayml", "dreamscape", "a", "b", "c", "d", "e"];
+  const [models, setModels] = useState<object>({});
+  const [schedulers, setSchedulers] = useState<object>({});
 
   const [serverUrl, setServerUrl] = useLocalStorage({
     key: "server-url",
-    defaultValue: "http://localhost:8000",
+    defaultValue: "",
   });
 
   const [samples, setSamples] = useLocalStorage({
@@ -47,6 +44,42 @@ const Parameters = ({ className = "" }: { className?: string }) => {
     defaultValue: "1",
   });
 
+  useEffect(() => {
+    if (serverUrl !== "") {
+      const url = serverUrl.replace("localhost", "127.0.0.1");
+
+      fetch(`${url}/get_models`, {
+        cache: "no-store",
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          setModels(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          setModels({});
+        });
+
+      fetch(`${url}/get_schedulers`, {
+        cache: "no-store",
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          setSchedulers(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          setSchedulers({});
+        });
+    }
+  }, [serverUrl]);
+
   return (
     <main
       className={twMerge(
@@ -63,13 +96,15 @@ const Parameters = ({ className = "" }: { className?: string }) => {
 
       <div className="w-full md:w-3/4 lg:w-full mt-12 flex items-center justify-around">
         <DropdownInput
-          data={models}
+          data={Object.keys(models)}
           className="w-1/2 mr-1 text-sm"
           placeholder="Model"
         />
 
         <DropdownInput
-          data={models}
+          data={Object.keys(schedulers).map((scheduler) =>
+            scheduler.toUpperCase()
+          )}
           className="w-1/2 ml-1 text-sm"
           placeholder="Scheduler"
         />

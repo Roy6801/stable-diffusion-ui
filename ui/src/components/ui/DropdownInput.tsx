@@ -6,17 +6,20 @@ import { twMerge } from "tailwind-merge";
 
 interface DropdownProps {
   data: string[];
-  placeholder?: string;
+  placeholder: string;
+  state?: string;
+  setState?: (val: string | ((prevState: string) => string)) => void;
   className?: string;
 }
 
 const DropdownInput = ({
   data,
   placeholder = "",
+  state = "",
+  setState = () => {},
   className,
 }: DropdownProps) => {
   const [opened, setOpened] = useState(false);
-  const [selected, setSelected] = useState(placeholder);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -39,10 +42,10 @@ const DropdownInput = ({
     <div
       key={item}
       className={twMerge(
-        "p-2 mr-2 rounded-md hover:pl-4 hover:bg-zinc-700 active:bg-zinc-900",
-        `${selected === item && "pl-4 bg-zinc-900"}`
+        "p-2 mr-2 rounded-md hover:pl-4 hover:bg-zinc-700 active:bg-zinc-900 text-sm font-semibold cursor-pointer",
+        `${state === item && "pl-4 bg-zinc-900"}`
       )}
-      onClick={(e) => setSelected(item)}
+      onClick={(e) => setState(item)}
     >
       {item}
     </div>
@@ -63,7 +66,9 @@ const DropdownInput = ({
             }`
           )}
         >
-          <div className="w-5/6 px-2 mx-1">{selected}</div>
+          <div className="w-5/6 px-2 mx-1 truncate">
+            {state !== "" ? state : placeholder}
+          </div>
           <IconChevronDown
             className={`transition-transform duration-300 w-1/6 ${
               opened && "rotate-180"
@@ -74,7 +79,13 @@ const DropdownInput = ({
       {opened && (
         <div className="absolute left-0 top-full w-full z-10 rounded-md mt-3 p-2 bg-zinc-800 text-amber-400 text-sm">
           <div className="w-full max-h-[200px] scrollbar overflow-x-hidden">
-            {items}
+            {Object.keys(items).length > 0 ? (
+              items
+            ) : (
+              <div className="min-h-[100px] flex items-center justify-center text-xl font-black text-zinc-600">
+                Nothing to Display
+              </div>
+            )}
           </div>
         </div>
       )}

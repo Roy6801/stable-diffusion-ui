@@ -16,7 +16,7 @@ const Button: FC<ButtonProps> = ({
   return (
     <button
       className={twMerge(
-        "rounded-sm active:scale-75 duration-300 text-sm text-amber-200 hover:text-black font-semibold bg-gradient-to-br hover:bg-gradient-to-tl from-amber-500 to-amber-200 p-[1px]",
+        "rounded-sm active:scale-75 duration-150 text-sm text-amber-200 hover:text-black font-semibold bg-gradient-to-br hover:bg-gradient-to-tl from-amber-500 to-amber-200 p-[1px]",
         className
       )}
       {...props}
