@@ -1,10 +1,10 @@
-from fastapi import WebSocket, WebSocketException, HTTPException
-from fastapi_restful import Resource
-from pydantic import BaseModel
+from fastapi import WebSocket
 import json
+import asyncio
+from threading import Thread
 
 
-class Txt2ImgParams(BaseModel):
+class Txt2ImgParams:
     prompt: str
     negative_prompt: str
     guidance_scale: int
@@ -13,19 +13,31 @@ class Txt2ImgParams(BaseModel):
     seed: int
     batch_size: int
 
+    def __init__(self, data):
+        for key in data:
+            setattr(self, key, data[key])
 
-class Txt2Img(Resource):
-    def __init__(self, shared_context):
-        self.__shared_context = shared_context
 
-    async def post(self, websocket: WebSocket):
-        try:
-            await websocket.accept()
-            data: Txt2ImgParams = json.loads(await websocket.receive_text())
+async def txt2img(shared_context, websocket: WebSocket):
+    try:
+        data: Txt2ImgParams = Txt2ImgParams(json.loads(await websocket.receive_text()))
 
-            tag = await txt2img(
-                self.__shared_context,
-                websocket,
+        queue = asyncio.Queue()
+
+        async def send_images():
+            while True:
+                image = await queue.get()
+                if image is None:
+                    break
+                await websocket.send_text(image)
+
+        send_task = asyncio.create_task(send_images())
+
+        Thread(
+            target=txt2img_generator,
+            args=(
+                shared_context,
+                queue,
                 data.prompt,
                 data.negative_prompt,
                 data.guidance_scale,
@@ -33,12 +45,13 @@ class Txt2Img(Resource):
                 data.aspect_ratio,
                 data.seed,
                 data.batch_size,
-            )
-            return tag
-        except WebSocketException as wse:
-            await websocket.close(code=wse.code)
-        except Exception as e:
-            raise HTTPException(500, str(e))
+            ),
+        ).start()
+
+        await send_task
+
+    except:
+        raise Exception("txt2img err")
 
 
 import torch
@@ -50,6 +63,7 @@ from datetime import datetime
 import time
 import os
 
+
 dimensions = {
     "1:1": [512, 512],
     "3:2": [768, 512],
@@ -60,12 +74,12 @@ dimensions = {
 def get_base64(image):
     buffer = BytesIO()
     image.save(buffer, format="PNG")
-    return base64.b64encode(buffer.getvalue())
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
-def txt2img(
+def txt2img_generator(
     shared_context,
-    websocket,
+    queue,
     prompt: str,
     negative_prompt: str,
     guidance_scale: int = 7,
@@ -90,25 +104,26 @@ def txt2img(
     prompt = [prompt for _ in range(batch_size)]
     negative_prompt = [negative_prompt for _ in range(batch_size)]
 
-    async def latents_callback(step, timestep, latents):
+    def latents_callback(step, timestep, latents):
         with torch.no_grad():
-            print(step, timestep)
-
             latents = 1 / 0.18215 * latents
             images = pipe.vae.decode(latents).sample
 
             images = (images / 2 + 0.5).clamp(0, 1)
 
-            # we always cast to float32 as this does not cause significant overhead and is compatible with floa16
+            # cast to float32 as this does not cause significant overhead and is compatible with floa16
             images = images.cpu().permute(0, 2, 3, 1).float().numpy()
 
             # convert to PIL Images
             images = pipe.numpy_to_pil(images)
 
-            # do something with the Images
+            latent_images = []
+
             for image in images:
-                b64_img = get_base64(image)
-                await websocket.send_text(b64_img)
+                latent_images.append(get_base64(image))
+
+            img_data = json.dumps(latent_images)
+            queue.put_nowait(img_data)
 
     with autocast(device):
         results = pipe(
@@ -123,15 +138,19 @@ def txt2img(
             callback_steps=5,
         ).images
 
-        images = []
-
         dir_name = datetime.today().strftime("%d-%m-%Y")
+        dir_path = os.path.join(TXT_2_IMG_DIR, dir_name)
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        images = []
 
         for ind, image in enumerate(results):
             file_name = f"{int(time.time())}_{seed}_{ind}.png"
             file_path = os.path.join(TXT_2_IMG_DIR, dir_name, file_name)
             image.save(file_path)
-            imgstr = get_base64(image)
-            images.append(imgstr)
+            images.append(get_base64(image))
 
-        return images
+        img_data = json.dumps(images)
+        queue.put_nowait(img_data)

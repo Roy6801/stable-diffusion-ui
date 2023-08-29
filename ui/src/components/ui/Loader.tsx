@@ -17,8 +17,6 @@ const Loader = ({ text }: { text: boolean | string }) => {
     };
   }, []);
 
-  console.log(count);
-
   return (
     <div className="absolute z-10 top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center">
       <span className="text-4xl font-black font-mono">

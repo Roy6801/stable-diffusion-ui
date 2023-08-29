@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_restful import Api
 from src.handlers import *
@@ -34,6 +34,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.websocket("/txt2img")
+async def txt2img(wb: WebSocket):
+    await wb.accept()
+    await txt2img(shared_context, wb)
+    await wb.close()
+
+
 api = Api(app)
 
 
@@ -45,7 +54,6 @@ get_models_ = GetModels(shared_context)
 get_schedulers_ = GetSchedulers(shared_context)
 load_model_ = LoadModel(shared_context)
 load_scheduler_ = LoadScheduler(shared_context)
-txt2img_ = Txt2Img(shared_context)
 
 
 # add resource models to api endpoints
@@ -56,4 +64,3 @@ api.add_resource(get_models_, "/get_models")
 api.add_resource(get_schedulers_, "/get_schedulers")
 api.add_resource(load_model_, "/load_model")
 api.add_resource(load_scheduler_, "/load_scheduler")
-api.add_resource(txt2img_, "/txt2img")

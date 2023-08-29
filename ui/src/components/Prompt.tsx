@@ -62,8 +62,7 @@ const Prompt = ({ className = "" }: PromptProps) => {
   const handleGenerate = () => {
     const url = serverUrl
       .replace("localhost", "127.0.0.1")
-      .replace("http", "ws")
-      .replace("https", "wss");
+      .replace("http", "ws");
 
     const prompt: Text2ImageProps = {
       prompt: positivePrompt,
@@ -77,7 +76,7 @@ const Prompt = ({ className = "" }: PromptProps) => {
 
     console.log(prompt);
 
-    const socket = new WebSocket(url);
+    const socket = new WebSocket(`${url}/txt2img`);
 
     socket.addEventListener("open", (event) => {
       console.log("WebSocket connection opened", event);
@@ -86,8 +85,11 @@ const Prompt = ({ className = "" }: PromptProps) => {
     });
 
     socket.addEventListener("message", (event) => {
-      console.log("Message from server:", event.data);
-      // Handle server responses or updates here
+      console.log(JSON.parse(event.data));
+    });
+
+    socket.addEventListener("close", (event) => {
+      console.log("WebSocket Closed!", event);
     });
 
     socket.addEventListener("error", (event) => {

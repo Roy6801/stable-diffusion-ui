@@ -6,6 +6,13 @@
       "author": "lykon",
       "identifier": "models--lykon--dreamshaper",
       "downloaded": false
+    },
+    "runwayml/stable-diffusion-v1-5": {
+      "revision": "fp16",
+      "model_name": "stable-diffusion-v1-5",
+      "author": "runwayml",
+      "identifier": "models--runwayml--stable-diffusion-v1-5",
+      "downloaded": true
     }
   },
   "scheduler": {

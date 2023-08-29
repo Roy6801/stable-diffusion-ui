@@ -105,7 +105,7 @@ const Parameters = ({ className = "" }: { className?: string }) => {
       console.log(model);
       const url = serverUrl.replace("localhost", "127.0.0.1");
 
-      setLoader(models[model]["downloaded"] ? true : "Downloading");
+      setLoader(models[model]["downloaded"] ? "Loading" : "Downloading");
 
       fetch(`${url}/load_model`, {
         cache: "no-store",
@@ -144,6 +144,7 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         .then((res) => res.json())
         .then((res) => {
           console.log(res);
+          setModel("");
         })
         .catch((err) => {
           console.log(err);
