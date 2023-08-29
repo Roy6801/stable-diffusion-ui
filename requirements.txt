@@ -2,6 +2,7 @@ fastapi==0.101.0
 fastapi-restful==0.5.0
 python-dotenv==1.0.0
 uvicorn==0.23.2
+websockets==11.0.3
 torch --index-url https://download.pytorch.org/whl/cu118
 torchvision --index-url https://download.pytorch.org/whl/cu118
 torchaudio --index-url https://download.pytorch.org/whl/cu118
