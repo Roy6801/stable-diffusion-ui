@@ -37,7 +37,7 @@ class Txt2Img(Resource):
             ).start()
 
             return StreamingResponse(
-                image_streamer(queue), media_type="text/event-stream"
+                image_streamer(queue), media_type="application/json"
             )
 
         except Exception as e:
@@ -71,7 +71,7 @@ async def image_streamer(queue: Queue):
         if img_data is None:
             break
 
-        yield img_data
+        yield json.dumps(img_data) + "\n"
 
 
 def get_base64(image):
@@ -125,8 +125,7 @@ def txt2img(
             for image in images:
                 latent_images.append(get_base64(image))
 
-            img_data = json.dumps(latent_images)
-            queue.put(img_data)
+            queue.put(latent_images)
 
     with autocast(device):
         results = pipe(
@@ -155,7 +154,5 @@ def txt2img(
             image.save(file_path)
             images.append(get_base64(image))
 
-        img_data = json.dumps(images)
-        queue.put(img_data)
-
+        queue.put(images)
         queue.put(None)

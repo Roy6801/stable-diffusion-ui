@@ -40,14 +40,21 @@ import time
 
 
 def async_data_generator():
-    for i in range(1, 11):
+    for data_item in [
+        {"key": "value1"},
+        {"key": "value2"},
+        {"key": "value3"},
+        {"key": "value4"},
+        {"key": "value5"},
+        {"key": "value6"},
+    ]:
         time.sleep(1)
-        yield f"Async Chunk {i}\n"
+        yield json.dumps(data_item) + "\n"
 
 
 @app.get("/async_stream")
 async def async_stream_response():
-    return StreamingResponse(async_data_generator(), media_type="text/event-stream")
+    return StreamingResponse(async_data_generator(), media_type="application/json")
 
 
 api = Api(app)
