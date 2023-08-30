@@ -1,10 +1,6 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
-from pydantic import BaseModel
-
-
-class LoadModelParams(BaseModel):
-    tag: str
+from ..validators import LoadModelParams
 
 
 class LoadModel(Resource):
@@ -21,7 +17,7 @@ class LoadModel(Resource):
 
 from diffusers import StableDiffusionPipeline
 from dotenv import find_dotenv, load_dotenv
-from src.utils import CONFIG_FILE, MODEL_DIR
+from ..utils import CONFIG_FILE, MODEL_DIR
 import torch
 import json
 import os

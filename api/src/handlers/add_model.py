@@ -1,11 +1,6 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
-from pydantic import BaseModel
-
-
-class AddModelParams(BaseModel):
-    tag: str
-    revision: str
+from ..validators import AddModelParams
 
 
 class AddModel(Resource):
@@ -20,7 +15,7 @@ class AddModel(Resource):
             raise HTTPException(500, str(e))
 
 
-from src.utils import CONFIG_FILE
+from ..utils import CONFIG_FILE
 import json
 
 

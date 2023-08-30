@@ -1,66 +1,57 @@
-from fastapi import WebSocket
-import json
-import asyncio
+from fastapi.responses import StreamingResponse
+from fastapi import HTTPException
+from fastapi_restful import Resource
 from threading import Thread
+from queue import Queue
 
 
-class Txt2ImgParams:
-    prompt: str
-    negative_prompt: str
-    guidance_scale: int
-    num_inference_steps: int
-    aspect_ratio: str
-    seed: int
-    batch_size: int
+class Txt2Img(Resource):
+    def __init__(self, shared_context):
+        self.__shared_context = shared_context
 
-    def __init__(self, data):
-        for key in data:
-            setattr(self, key, data[key])
+    async def get(
+        self,
+        prompt: str,
+        negative_prompt: str,
+        guidance_scale: int = 7,
+        num_inference_steps: int = 50,
+        aspect_ratio: str = "1:1",
+        seed: int = 0,
+        batch_size: int = 1,
+    ):
+        try:
+            queue = Queue()
+            Thread(
+                target=txt2img,
+                args=(
+                    self.__shared_context,
+                    queue,
+                    prompt,
+                    negative_prompt,
+                    guidance_scale,
+                    num_inference_steps,
+                    aspect_ratio,
+                    seed,
+                    batch_size,
+                ),
+            ).start()
 
+            return StreamingResponse(
+                image_streamer(queue), media_type="text/event-stream"
+            )
 
-async def txt2img(shared_context, websocket: WebSocket):
-    try:
-        data: Txt2ImgParams = Txt2ImgParams(json.loads(await websocket.receive_text()))
-
-        queue = asyncio.Queue()
-
-        async def send_images():
-            while True:
-                image = await queue.get()
-                if image is None:
-                    break
-                await websocket.send_text(image)
-
-        send_task = asyncio.create_task(send_images())
-
-        Thread(
-            target=txt2img_generator,
-            args=(
-                shared_context,
-                queue,
-                data.prompt,
-                data.negative_prompt,
-                data.guidance_scale,
-                data.num_inference_steps,
-                data.aspect_ratio,
-                data.seed,
-                data.batch_size,
-            ),
-        ).start()
-
-        await send_task
-
-    except:
-        raise Exception("txt2img err")
+        except Exception as e:
+            raise HTTPException(500, str(e))
 
 
 import torch
 from torch import autocast
-from src.utils import TXT_2_IMG_DIR
+from ..utils import TXT_2_IMG_DIR
 from io import BytesIO
 import base64
 from datetime import datetime
 import time
+import json
 import os
 
 
@@ -71,15 +62,27 @@ dimensions = {
 }
 
 
+async def image_streamer(queue: Queue):
+    while True:
+        if queue.empty():
+            continue
+
+        img_data = queue.get()
+        if img_data is None:
+            break
+
+        yield img_data
+
+
 def get_base64(image):
     buffer = BytesIO()
     image.save(buffer, format="PNG")
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
-def txt2img_generator(
-    shared_context,
-    queue,
+def txt2img(
+    shared_context: dict,
+    queue: Queue,
     prompt: str,
     negative_prompt: str,
     guidance_scale: int = 7,
@@ -123,7 +126,7 @@ def txt2img_generator(
                 latent_images.append(get_base64(image))
 
             img_data = json.dumps(latent_images)
-            queue.put_nowait(img_data)
+            queue.put(img_data)
 
     with autocast(device):
         results = pipe(
@@ -153,4 +156,6 @@ def txt2img_generator(
             images.append(get_base64(image))
 
         img_data = json.dumps(images)
-        queue.put_nowait(img_data)
+        queue.put(img_data)
+
+        queue.put(None)

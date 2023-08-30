@@ -1,10 +1,6 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
-from pydantic import BaseModel
-
-
-class RemoveModelParams(BaseModel):
-    tag: str
+from ..validators import RemoveModelParams
 
 
 class RemoveModel(Resource):
@@ -19,7 +15,7 @@ class RemoveModel(Resource):
             raise HTTPException(500, str(e))
 
 
-from src.utils import CONFIG_FILE, MODEL_DIR
+from ..utils import CONFIG_FILE, MODEL_DIR
 import shutil
 import json
 import os
