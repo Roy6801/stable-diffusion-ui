@@ -3,7 +3,6 @@ import TextArea from "./ui/TextArea";
 import Button from "./ui/Button";
 import { useLocalStorage } from "@mantine/hooks";
 import { getRandomInt } from "@/utils/functions";
-import { useState } from "react";
 
 interface PromptProps {
   className?: string;
@@ -61,10 +60,8 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
     defaultValue: "1",
   });
 
-  const handleGenerate = () => {
-    const url = serverUrl
-      .replace("localhost", "127.0.0.1")
-      .replace("http", "ws");
+  const handleGenerate = async () => {
+    const url = serverUrl.replace("localhost", "127.0.0.1");
 
     const prompt: Text2ImageProps = {
       prompt: positivePrompt,
@@ -78,25 +75,27 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
 
     console.log(prompt);
 
-    const socket = new WebSocket(`${url}/txt2img`);
+    try {
+      const params = new URLSearchParams();
+      Object.entries(prompt).forEach(([key, value]) => {
+        params.append(key, String(value));
+      });
 
-    socket.addEventListener("open", (event) => {
-      console.log("WebSocket connection opened", event);
-      // Send data to the server after connection is established
-      socket.send(JSON.stringify(prompt));
-    });
+      const response = await fetch(`${url}/txt2img?${params}`);
 
-    socket.addEventListener("message", (event) => {
-      setState(JSON.parse(event.data));
-    });
+      if (response.body) {
+        const reader = response.body.getReader();
 
-    socket.addEventListener("close", (event) => {
-      console.log("WebSocket Closed!", event);
-    });
-
-    socket.addEventListener("error", (event) => {
-      console.error("WebSocket error:", event);
-    });
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const images = JSON.parse(new TextDecoder().decode(value));
+          setState(images);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   return (
