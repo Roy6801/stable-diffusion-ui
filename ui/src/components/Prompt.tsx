@@ -81,7 +81,7 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
         params.append(key, String(value));
       });
 
-      const response = await fetch(`${url}/async_stream`, {
+      const response = await fetch(`${url}/txt2img?${params}`, {
         cache: "no-store",
         headers: {
           "ngrok-skip-browser-warning": "true",
@@ -91,14 +91,22 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
       if (response.body) {
         const reader = response.body.getReader();
 
+        let data = "";
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const data = new TextDecoder().decode(value);
-          // console.log(data.length);
-          const images = JSON.parse(data);
-          console.log(images);
-          // setState(images);
+          data += new TextDecoder().decode(value);
+
+          if (data.includes("\n")) {
+            const [jsonObject, remainingData] = data.split("\n", 1);
+            const images = JSON.parse(jsonObject);
+            console.log(images);
+
+            if (remainingData) data = remainingData;
+            else data = "";
+            setState(images);
+          }
         }
       }
     } catch (error) {

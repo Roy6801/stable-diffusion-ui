@@ -52,7 +52,7 @@ def async_data_generator():
         yield json.dumps(data_item) + "\n"
 
 
-@app.get("/async_stream")
+@app.get("/stream_test")
 async def async_stream_response():
     return StreamingResponse(async_data_generator(), media_type="application/json")
 
