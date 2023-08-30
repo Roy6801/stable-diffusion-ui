@@ -8,7 +8,8 @@ import { IconMenu, IconX } from "@tabler/icons-react";
 import { twMerge } from "tailwind-merge";
 
 const Home = () => {
-  const [menu, setMenu] = useState(false);
+  const [generation, setGeneration] = useState<string[]>([]);
+  const [menu, setMenu] = useState<boolean>(false);
 
   return (
     <main className="h-screen w-screen flex flex-col lg:flex-row bg-zinc-900">
@@ -38,8 +39,8 @@ const Home = () => {
       </div>
 
       <div className={twMerge("flex-1 flex flex-col", menu && "hidden")}>
-        <Feed />
-        <Prompt />
+        <Feed state={generation} />
+        <Prompt setState={setGeneration} />
       </div>
     </main>
   );

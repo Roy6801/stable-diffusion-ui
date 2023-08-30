@@ -1,21 +1,8 @@
+from ..validators import Txt2ImgParams
 from fastapi import WebSocket
-import json
-import asyncio
 from threading import Thread
-
-
-class Txt2ImgParams:
-    prompt: str
-    negative_prompt: str
-    guidance_scale: int
-    num_inference_steps: int
-    aspect_ratio: str
-    seed: int
-    batch_size: int
-
-    def __init__(self, data):
-        for key in data:
-            setattr(self, key, data[key])
+import asyncio
+import json
 
 
 async def txt2img(shared_context, websocket: WebSocket):
@@ -56,7 +43,7 @@ async def txt2img(shared_context, websocket: WebSocket):
 
 import torch
 from torch import autocast
-from src.utils import TXT_2_IMG_DIR
+from ..utils import TXT_2_IMG_DIR
 from io import BytesIO
 import base64
 from datetime import datetime

@@ -37,7 +37,7 @@ app.add_middleware(
 
 
 @app.websocket("/txt2img")
-async def txt2img(wb: WebSocket):
+async def txt_2_img(wb: WebSocket):
     await wb.accept()
     await txt2img(shared_context, wb)
     await wb.close()

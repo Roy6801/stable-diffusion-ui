@@ -1,10 +1,6 @@
 from fastapi import HTTPException
 from fastapi_restful import Resource
-from pydantic import BaseModel
-
-
-class LoadSchedulerParams(BaseModel):
-    scheduler_id: str
+from ..validators import LoadSchedulerParams
 
 
 class LoadScheduler(Resource):

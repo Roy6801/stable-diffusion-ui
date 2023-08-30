@@ -3,9 +3,11 @@ import TextArea from "./ui/TextArea";
 import Button from "./ui/Button";
 import { useLocalStorage } from "@mantine/hooks";
 import { getRandomInt } from "@/utils/functions";
+import { useState } from "react";
 
 interface PromptProps {
   className?: string;
+  setState?: (val: string[] | ((prevState: string[]) => string[])) => void;
 }
 
 interface Text2ImageProps {
@@ -18,7 +20,7 @@ interface Text2ImageProps {
   batch_size: number;
 }
 
-const Prompt = ({ className = "" }: PromptProps) => {
+const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
   const [positivePrompt, setPositivePrompt] = useLocalStorage({
     key: "positive-prompt",
     defaultValue: "",
@@ -85,7 +87,7 @@ const Prompt = ({ className = "" }: PromptProps) => {
     });
 
     socket.addEventListener("message", (event) => {
-      console.log(JSON.parse(event.data));
+      setState(JSON.parse(event.data));
     });
 
     socket.addEventListener("close", (event) => {
