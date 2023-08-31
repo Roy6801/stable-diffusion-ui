@@ -46,10 +46,11 @@ class Txt2Img(Resource):
 
 import torch
 from torch import autocast
-from ..utils import TXT_2_IMG_DIR
+from ..utils import TXT_2_IMG_LOG, TXT_2_IMG_DIR
 from io import BytesIO
 import base64
 from datetime import datetime
+from random import randint
 import time
 import json
 import os
@@ -101,7 +102,8 @@ def txt2img(
     width, height = dimensions[aspect_ratio]
 
     generator = [
-        torch.Generator(device="cuda").manual_seed(seed) for _ in range(batch_size)
+        torch.Generator(device="cuda").manual_seed(gen_seed)
+        for gen_seed in range(seed, seed + batch_size)
     ]
 
     prompt = [prompt for _ in range(batch_size)]
@@ -140,19 +142,47 @@ def txt2img(
             callback_steps=5,
         ).images
 
-        dir_name = datetime.today().strftime("%d-%m-%Y")
+        dir_name = datetime.today().strftime(
+            "%Y-%m-%d"
+        )  # This order allows the directory to be sorted by default
         dir_path = os.path.join(TXT_2_IMG_DIR, dir_name)
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
+        fr = open(TXT_2_IMG_LOG, "r")
+        image_log = json.load(fr)
+        fr.close()
+
+        fw = open(TXT_2_IMG_LOG, "w")
+
         images = []
 
-        for ind, image in enumerate(results):
-            file_name = f"{int(time.time())}_{seed}_{ind}.png"
+        for index, image in enumerate(results):
+            file_id_seed = randint(0, seed + index)
+            file_id = f"{int(time.time())}_{seed}_{index}_{file_id_seed}"
+            file_name = f"{file_id}.png"
             file_path = os.path.join(TXT_2_IMG_DIR, dir_name, file_name)
             image.save(file_path)
             images.append(get_base64(image))
 
+            image_log[dir_name] = image_log.get(dir_name, {})
+            image_log[dir_name][file_id] = {
+                "path": file_path,
+                "index": index,
+                "gen_seed": seed + index,
+                "file_id_seed": file_id_seed,
+                "prompt": prompt,
+                "negative_promot": negative_prompt,
+                "guidance_scale": guidance_scale,
+                "num_inference_steps": num_inference_steps,
+                "aspect_ratio": aspect_ratio,
+                "seed": seed,
+                "batch_size": batch_size,
+            }
+
         queue.put(images)
         queue.put(None)
+
+        json.dump(image_log, fw, indent=2)
+        fw.close()
