@@ -69,6 +69,8 @@ get_schedulers_ = GetSchedulers(shared_context)
 load_model_ = LoadModel(shared_context)
 load_scheduler_ = LoadScheduler(shared_context)
 txt2img_ = Txt2Img(shared_context)
+get_dates_ = GetDates()
+get_images_ = GetImages()
 
 
 # add resource models to api endpoints
@@ -80,3 +82,5 @@ api.add_resource(get_schedulers_, "/get_schedulers")
 api.add_resource(load_model_, "/load_model")
 api.add_resource(load_scheduler_, "/load_scheduler")
 api.add_resource(txt2img_, "/txt2img")
+api.add_resource(get_dates_, "/get_dates")
+api.add_resource(get_images_, "/get_images")
