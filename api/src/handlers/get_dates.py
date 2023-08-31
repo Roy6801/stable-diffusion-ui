@@ -10,17 +10,14 @@ class GetDates(Resource):
             raise HTTPException(500, str(e))
 
 
-from ..utils import TXT_2_IMG_LOG
-import json
+from ..utils.functions import load_txt2img_log, save_txt2img_log
 
-image_logs = {"txt2img": TXT_2_IMG_LOG}
+functions = {"txt2img": [load_txt2img_log, save_txt2img_log]}
 
 
 def get_dates(image_dir: str):
-    log_path = image_logs[image_dir]
+    loader, saver = functions[image_dir]
+    image_log = loader()
+    saver(image_log)
 
-    fr = open(log_path, "r")
-    dir_list: dict = json.load(fr)
-    fr.close()
-
-    return dir_list.keys()
+    return list(image_log.keys())

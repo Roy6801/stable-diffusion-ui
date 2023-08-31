@@ -46,11 +46,12 @@ class Txt2Img(Resource):
 
 import torch
 from torch import autocast
-from ..utils import TXT_2_IMG_LOG, TXT_2_IMG_DIR
-from io import BytesIO
-import base64
+from ..utils.functions import load_txt2img_log, save_txt2img_log
+from ..utils import TXT_2_IMG_DIR
 from datetime import datetime
 from random import randint
+from io import BytesIO
+import base64
 import time
 import json
 import os
@@ -150,16 +151,12 @@ def txt2img(
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-        fr = open(TXT_2_IMG_LOG, "r")
-        image_log = json.load(fr)
-        fr.close()
-
-        fw = open(TXT_2_IMG_LOG, "w")
+        image_log = load_txt2img_log()
 
         images = []
 
         for index, image in enumerate(results):
-            file_id_seed = randint(0, seed + index)
+            file_id_seed = randint(0, 999)
             file_id = f"{int(time.time())}_{seed}_{index}_{file_id_seed}"
             file_name = f"{file_id}.png"
             file_path = os.path.join(TXT_2_IMG_DIR, dir_name, file_name)
@@ -172,8 +169,8 @@ def txt2img(
                 "index": index,
                 "gen_seed": seed + index,
                 "file_id_seed": file_id_seed,
-                "prompt": prompt,
-                "negative_promot": negative_prompt,
+                "prompt": prompt[0],
+                "negative_promot": negative_prompt[0],
                 "guidance_scale": guidance_scale,
                 "num_inference_steps": num_inference_steps,
                 "aspect_ratio": aspect_ratio,
@@ -184,5 +181,4 @@ def txt2img(
         queue.put(images)
         queue.put(None)
 
-        json.dump(image_log, fw, indent=2)
-        fw.close()
+        save_txt2img_log(image_log)
