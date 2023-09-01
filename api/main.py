@@ -24,7 +24,6 @@ shared_context = {
     "config": config,
 }
 
-load_scheduler.load_scheduler(shared_context)
 
 app = FastAPI()
 

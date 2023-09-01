@@ -34,7 +34,6 @@ def load_model(shared_context, tag: str):
 
     if tag in config["models"]:
         device = shared_context["device"]
-        scheduler = shared_context["scheduler"]
         revision = config["models"][tag]["revision"]
 
         revision = revision.lower().strip()
@@ -46,7 +45,6 @@ def load_model(shared_context, tag: str):
             use_auth_token=auth_token,
             cache_dir="models",
             safety_checker=None,
-            scheduler=scheduler,
         )
 
         pipe = pipe.to(device)

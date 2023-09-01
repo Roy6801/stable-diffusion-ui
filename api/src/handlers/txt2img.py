@@ -20,9 +20,6 @@ class Txt2Img(Resource):
         batch_size: int = 1,
     ):
         try:
-            if self.__shared_context["pipe"] is None:
-                raise Exception("No Model Loaded!")
-
             queue = Queue()
             Thread(
                 target=txt2img,
@@ -44,6 +41,7 @@ class Txt2Img(Resource):
             )
 
         except Exception as e:
+            print("HTTP EXCEPTION", e)
             raise HTTPException(500, str(e))
 
 
@@ -74,6 +72,11 @@ async def image_streamer(queue: Queue):
 
         img_data = queue.get()
         if img_data is None:
+            yield json.dumps({"detail": "success", "status": 200}) + "\n"
+            break
+
+        if isinstance(img_data, Exception):
+            yield json.dumps({"detail": str(img_data), "status": 500}) + "\n"
             break
 
         yield json.dumps(img_data) + "\n"
@@ -96,100 +99,108 @@ def txt2img(
     seed: int = 0,
     batch_size: int = 1,
 ):
-    device = shared_context["device"]
-    pipe = shared_context["pipe"]
-    tag = shared_context["tag"]
-    scheduler = shared_context["scheduler"]
-    scheduler_id = shared_context["scheduler_id"]
+    try:
+        pipe = shared_context["pipe"]
 
-    prompt = prompt.strip()
-    negative_prompt = negative_prompt.strip()
-    aspect_ratio = aspect_ratio.strip()
+        if pipe is None:
+            raise Exception("No Model Loaded!")
 
-    width, height = dimensions[aspect_ratio]
+        device = shared_context["device"]
+        tag = shared_context["tag"]
+        scheduler = shared_context["scheduler"]
+        scheduler_id = shared_context["scheduler_id"]
 
-    generator = [
-        torch.Generator(device="cuda").manual_seed(gen_seed)
-        for gen_seed in range(seed, seed + batch_size)
-    ]
+        pipe.scheduler = scheduler
 
-    prompt = [prompt for _ in range(batch_size)]
-    negative_prompt = [negative_prompt for _ in range(batch_size)]
+        prompt = prompt.strip()
+        negative_prompt = negative_prompt.strip()
+        aspect_ratio = aspect_ratio.strip()
 
-    def latents_callback(step, timestep, latents):
-        with torch.no_grad():
-            latents = 1 / 0.18215 * latents
-            images = pipe.vae.decode(latents).sample
+        width, height = dimensions[aspect_ratio]
 
-            images = (images / 2 + 0.5).clamp(0, 1)
+        generator = [
+            torch.Generator(device="cuda").manual_seed(gen_seed)
+            for gen_seed in range(seed, seed + batch_size)
+        ]
 
-            # cast to float32 as this does not cause significant overhead and is compatible with floa16
-            images = images.cpu().permute(0, 2, 3, 1).float().numpy()
+        prompt = [prompt for _ in range(batch_size)]
+        negative_prompt = [negative_prompt for _ in range(batch_size)]
 
-            # convert to PIL Images
-            images = pipe.numpy_to_pil(images)
+        def latents_callback(step, timestep, latents):
+            with torch.no_grad():
+                latents = 1 / 0.18215 * latents
+                images = pipe.vae.decode(latents).sample
 
-            latent_images = []
+                images = (images / 2 + 0.5).clamp(0, 1)
 
-            for image in images:
-                latent_images.append(get_base64(image))
+                # cast to float32 as this does not cause significant overhead and is compatible with floa16
+                images = images.cpu().permute(0, 2, 3, 1).float().numpy()
 
-            queue.put(latent_images)
+                # convert to PIL Images
+                images = pipe.numpy_to_pil(images)
 
-    with autocast(device):
-        results = pipe(
-            prompt,
-            negative_prompt=negative_prompt,
-            guidance_scale=guidance_scale,
-            num_inference_steps=num_inference_steps,
-            width=width,
-            height=height,
-            generator=generator,
-            callback=latents_callback,
-            callback_steps=5,
-            scheduler=scheduler,
-        ).images
+                latent_images = []
 
-        dir_name = datetime.today().strftime(
-            "%Y-%m-%d"
-        )  # This order allows the directory to be sorted by default
-        dir_path = os.path.join(TXT_2_IMG_DIR, dir_name)
+                for image in images:
+                    latent_images.append(get_base64(image))
 
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
+                queue.put(latent_images)
 
-        image_log = load_txt2img_log()
+        with autocast(device):
+            results = pipe(
+                prompt,
+                negative_prompt=negative_prompt,
+                guidance_scale=guidance_scale,
+                num_inference_steps=num_inference_steps,
+                width=width,
+                height=height,
+                generator=generator,
+                callback=latents_callback,
+                callback_steps=5,
+            ).images
 
-        images = []
+            dir_name = datetime.today().strftime(
+                "%Y-%m-%d"
+            )  # This order allows the directory to be sorted by default
+            dir_path = os.path.join(TXT_2_IMG_DIR, dir_name)
 
-        for index, image in enumerate(results):
-            file_id_seed = randint(0, 999)
-            file_id = f"{int(time.time())}_{seed}_{index}_{file_id_seed}"
-            file_name = f"{file_id}.png"
-            file_path = os.path.join(TXT_2_IMG_DIR, dir_name, file_name)
-            image.save(file_path)
-            encoded_image = get_base64(image)
-            images.append(encoded_image)
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
 
-            image_log[dir_name] = image_log.get(dir_name, {})
-            image_log[dir_name][file_id] = {
-                "path": file_path,
-                "index": index,
-                "gen_seed": seed + index,
-                "file_id_seed": file_id_seed,
-                "prompt": prompt[0],
-                "negative_promot": negative_prompt[0],
-                "guidance_scale": guidance_scale,
-                "num_inference_steps": num_inference_steps,
-                "aspect_ratio": aspect_ratio,
-                "seed": seed,
-                "batch_size": batch_size,
-                "model": tag,
-                "scheduler": scheduler_id,
-                "encoded": encoded_image,
-            }
+            image_log = load_txt2img_log()
 
-        queue.put(images)
-        queue.put(None)
+            images = []
 
-        save_txt2img_log(image_log)
+            for index, image in enumerate(results):
+                file_id_seed = randint(0, 999)
+                file_id = f"{int(time.time())}_{seed}_{index}_{file_id_seed}"
+                file_name = f"{file_id}.png"
+                file_path = os.path.join(TXT_2_IMG_DIR, dir_name, file_name)
+                image.save(file_path)
+                encoded_image = get_base64(image)
+                images.append(encoded_image)
+
+                image_log[dir_name] = image_log.get(dir_name, {})
+                image_log[dir_name][file_id] = {
+                    "path": file_path,
+                    "index": index,
+                    "gen_seed": seed + index,
+                    "file_id_seed": file_id_seed,
+                    "prompt": prompt[0],
+                    "negative_promot": negative_prompt[0],
+                    "guidance_scale": guidance_scale,
+                    "num_inference_steps": num_inference_steps,
+                    "aspect_ratio": aspect_ratio,
+                    "seed": seed,
+                    "batch_size": batch_size,
+                    "model": tag,
+                    "scheduler": scheduler_id,
+                    "encoded": encoded_image,
+                }
+
+            queue.put(images)
+            queue.put(None)
+
+            save_txt2img_log(image_log)
+    except Exception as e:
+        queue.put(e)
