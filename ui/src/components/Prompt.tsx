@@ -45,7 +45,7 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
     defaultValue: 7,
   });
 
-  const [seed] = useLocalStorage({
+  const [seed, setSeed] = useLocalStorage({
     key: "prompt-seed",
     defaultValue: getRandomInt(0, 99999999999),
   });
@@ -109,8 +109,9 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
           }
         }
       }
+      setSeed(getRandomInt(0, 99999999999));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.log("Error fetching data:", error);
     }
   };
 

@@ -20,6 +20,9 @@ class Txt2Img(Resource):
         batch_size: int = 1,
     ):
         try:
+            if self.__shared_context["pipe"] is None:
+                raise Exception("No Model Loaded!")
+
             queue = Queue()
             Thread(
                 target=txt2img,
@@ -95,6 +98,9 @@ def txt2img(
 ):
     device = shared_context["device"]
     pipe = shared_context["pipe"]
+    tag = shared_context["tag"]
+    scheduler = shared_context["scheduler"]
+    scheduler_id = shared_context["scheduler_id"]
 
     prompt = prompt.strip()
     negative_prompt = negative_prompt.strip()
@@ -141,6 +147,7 @@ def txt2img(
             generator=generator,
             callback=latents_callback,
             callback_steps=5,
+            scheduler=scheduler,
         ).images
 
         dir_name = datetime.today().strftime(
@@ -161,7 +168,8 @@ def txt2img(
             file_name = f"{file_id}.png"
             file_path = os.path.join(TXT_2_IMG_DIR, dir_name, file_name)
             image.save(file_path)
-            images.append(get_base64(image))
+            encoded_image = get_base64(image)
+            images.append(encoded_image)
 
             image_log[dir_name] = image_log.get(dir_name, {})
             image_log[dir_name][file_id] = {
@@ -176,6 +184,9 @@ def txt2img(
                 "aspect_ratio": aspect_ratio,
                 "seed": seed,
                 "batch_size": batch_size,
+                "model": tag,
+                "scheduler": scheduler_id,
+                "encoded": encoded_image,
             }
 
         queue.put(images)

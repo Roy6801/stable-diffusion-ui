@@ -32,3 +32,4 @@ def load_scheduler(shared_context: dict, scheduler_id: str = ""):
     scheduler = scheduler_model.from_config(scheduler_config)
     shared_context["scheduler"] = scheduler
     shared_context["scheduler_name"] = scheduler_name
+    shared_context["scheduler_id"] = scheduler_id

@@ -19,6 +19,7 @@ shared_context = {
     "tag": "",
     "scheduler": None,
     "scheduler_name": "",
+    "scheduler_id": "",
     "device": "cuda",
     "config": config,
 }
