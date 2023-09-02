@@ -12,7 +12,7 @@ class Txt2Img(Resource):
     async def get(
         self,
         prompt: str,
-        negative_prompt: str,
+        negative_prompt: str = "nsfw",
         guidance_scale: int = 7,
         num_inference_steps: int = 50,
         aspect_ratio: str = "1:1",
@@ -110,9 +110,16 @@ def txt2img(
         scheduler = shared_context["scheduler"]
         scheduler_id = shared_context["scheduler_id"]
 
+        if scheduler is None:
+            raise Exception("No Scheduler Loaded!")
+
         pipe.scheduler = scheduler
 
         prompt = prompt.strip()
+
+        if prompt == "":
+            raise Exception("Prompt is Required!")
+
         negative_prompt = negative_prompt.strip()
         aspect_ratio = aspect_ratio.strip()
 

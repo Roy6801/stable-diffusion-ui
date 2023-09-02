@@ -38,7 +38,12 @@ const Home = () => {
         <Parameters className={`${!menu && "hidden lg:flex"}`} />
       </div>
 
-      <div className={twMerge("flex-1 flex flex-col", menu && "hidden")}>
+      <div
+        className={twMerge(
+          "w-screen flex-1 lg:w-3/4 flex flex-col overflow-hidden",
+          menu && "hidden"
+        )}
+      >
         <Feed state={generation} />
         <Prompt setState={setGeneration} />
       </div>

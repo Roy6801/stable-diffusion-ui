@@ -19,8 +19,6 @@ interface RemoveModelProps {
 const Settings = () => {
   const [models, setModels] = useState<object>({});
 
-  const [downloaded, setDownloaded] = useState<boolean>(false);
-
   const [addModel, setAddModel] = useLocalStorage({
     key: "add-model",
     defaultValue: "",
@@ -114,6 +112,7 @@ const Settings = () => {
       console.log(removed);
 
       fetchModels();
+      setRemoveModel("");
     }
   };
 
