@@ -1,5 +1,6 @@
 import { HTMLAttributes } from "react";
 import { SegmentedControlProps } from "@mantine/core";
+import { ImageProps } from ".";
 
 interface StateUpdate<T, U> {
   state?: T;
@@ -41,6 +42,11 @@ interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   disabled?: boolean;
 }
 
+interface PromptDetailProps {
+  onClose: () => void;
+  image: ImageProps | undefined;
+}
+
 export type {
   TextInputProps,
   TextAreaProps,
@@ -48,4 +54,5 @@ export type {
   SegmentInputProps,
   DropdownProps,
   ButtonProps,
+  PromptDetailProps,
 };

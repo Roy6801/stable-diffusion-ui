@@ -69,6 +69,7 @@ const Gallery = () => {
             image_dir: "txt2img",
             date: current,
             desc: "true",
+            pagination: "false",
           })}`
         )) as ImageMapProps;
 
@@ -80,7 +81,7 @@ const Gallery = () => {
   console.log(images);
 
   return (
-    <main className="h-screen w-screen flex flex-col bg-zinc-900 p-5">
+    <main className="relative h-screen w-screen flex flex-col bg-zinc-900 p-5">
       <div className="w-full flex flex-col md:flex-row flex-1 overflow-hidden">
         <div className="w-screen md:w-1/6 md:h-full flex flex-row md:flex-col p-2 scrollbar">
           {dates.length > 0 &&

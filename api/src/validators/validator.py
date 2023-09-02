@@ -32,5 +32,6 @@ class ImageParams(BaseModel):
     seed: int
     batch_size: int
     model: str
+    revision: str
     scheduler: str
     encoded: str

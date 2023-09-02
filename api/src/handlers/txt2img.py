@@ -97,8 +97,10 @@ def txt2img(
         if pipe is None:
             raise Exception("No Model Loaded!")
 
+        config = shared_context["config"]
         device = shared_context["device"]
         tag = shared_context["tag"]
+        revision = config["models"][tag]["revision"]
         scheduler = shared_context["scheduler"]
         scheduler_id = shared_context["scheduler_id"]
 
@@ -193,6 +195,7 @@ def txt2img(
                     "seed": seed,
                     "batch_size": batch_size,
                     "model": tag,
+                    "revision": revision,
                     "scheduler": scheduler_id,
                     "encoded": "",
                 }

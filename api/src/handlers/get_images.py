@@ -9,11 +9,16 @@ class GetImages(Resource):
         image_dir: str = "txt2img",
         date: str = "",
         desc: bool = False,
+        pagination: bool = True,
         limit: int = 2,
         offset: int = 0,
     ):
         try:
+            if limit < 0 or offset < 0:
+                raise Exception("Invalid Page Requested!")
             images = get_images(image_dir, date, desc)
+            if not pagination:
+                limit, offset = 0, 0
             return paginate(images, limit, offset)
         except Exception as e:
             raise HTTPException(500, str(e))
@@ -28,8 +33,12 @@ directories = {"txt2img": TXT_2_IMG_DIR}
 
 
 def paginate(images: dict[str, ImageParams], limit: int, offset: int):
-    end = min(offset + limit, len(images))
-    img_keys: list[str] = list(images)[offset:end]
+    img_keys: list[str] = list(images)
+
+    if not (limit == 0 and offset == 0):
+        start = min(offset, len(images) - 1)
+        end = min(start + limit, len(images) - 1)
+        img_keys = img_keys[start:end]
 
     img_response = {}
 
