@@ -47,12 +47,10 @@ class Txt2Img(Resource):
 
 import torch
 from torch import autocast
-from ..utils.functions import load_txt2img_log, save_txt2img_log
+from ..utils.functions import load_txt2img_log, save_txt2img_log, get_base64
 from ..utils import TXT_2_IMG_DIR
 from datetime import datetime
 from random import randint
-from io import BytesIO
-import base64
 import time
 import json
 import os
@@ -80,12 +78,6 @@ async def image_streamer(queue: Queue):
             break
 
         yield json.dumps(img_data) + "\n"
-
-
-def get_base64(image):
-    buffer = BytesIO()
-    image.save(buffer, format="PNG")
-    return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
 def txt2img(
@@ -174,7 +166,7 @@ def txt2img(
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
 
-            image_log = load_txt2img_log()
+            image_log = load_txt2img_log(dir_path=dir_path)
 
             images = []
 
@@ -187,14 +179,14 @@ def txt2img(
                 encoded_image = get_base64(image)
                 images.append(encoded_image)
 
-                image_log[dir_name] = image_log.get(dir_name, {})
-                image_log[dir_name][file_id] = {
+                image_log[file_id] = {
                     "path": file_path,
                     "index": index,
                     "gen_seed": seed + index,
+                    "file_id": file_id,
                     "file_id_seed": file_id_seed,
                     "prompt": prompt[0],
-                    "negative_promot": negative_prompt[0],
+                    "negative_prompt": negative_prompt[0],
                     "guidance_scale": guidance_scale,
                     "num_inference_steps": num_inference_steps,
                     "aspect_ratio": aspect_ratio,
@@ -202,12 +194,12 @@ def txt2img(
                     "batch_size": batch_size,
                     "model": tag,
                     "scheduler": scheduler_id,
-                    "encoded": encoded_image,
+                    "encoded": "",
                 }
 
             queue.put(images)
             queue.put(None)
 
-            save_txt2img_log(image_log)
+            save_txt2img_log(dir_path=dir_path, log_data=image_log)
     except Exception as e:
         queue.put(e)
