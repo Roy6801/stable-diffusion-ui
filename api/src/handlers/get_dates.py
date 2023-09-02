@@ -10,17 +10,14 @@ class GetDates(Resource):
             raise HTTPException(500, str(e))
 
 
-from ..utils.functions import load_txt2img_log, save_txt2img_log
+from ..utils import TXT_2_IMG_DIR
+import os
 
-functions = {"txt2img": [load_txt2img_log, save_txt2img_log]}
+directories = {"txt2img": TXT_2_IMG_DIR}
 
 
 def get_dates(image_dir: str, desc: bool):
-    loader, saver = functions[image_dir]
-    image_log = loader()
-    saver(image_log)
-
-    dates = list(image_log.keys())
+    dates = os.listdir(directories[image_dir])
 
     if desc:
         dates = dates[::-1]
