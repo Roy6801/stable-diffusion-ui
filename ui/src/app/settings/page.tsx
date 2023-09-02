@@ -121,9 +121,9 @@ const Settings = () => {
   }, [serverUrl]);
 
   return (
-    <main className="h-screen w-screen flex bg-zinc-900 items-center justify-center">
-      <div className="w-1/2 h-1/2 flex flex-col items-center justify-around">
-        <div className="flex flex-col w-full">
+    <main className="h-screen w-screen flex bg-zinc-900 items-center justify-center p-2">
+      <div className="w-full h-full flex flex-col items-center justify-around overflow-x-hidden scrollbar p-5">
+        <div className="flex flex-col w-full md:w-2/3 mt-16">
           <span className="text-amber-400 font-semibold mb-2">Add Model</span>
           <div className="flex flex-col lg:flex-row mb-4">
             <TextInput
@@ -143,7 +143,7 @@ const Settings = () => {
             Add
           </Button>
         </div>
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full md:w-2/3">
           <span className="text-amber-400 font-semibold mb-2">
             Remove Model
           </span>
@@ -161,7 +161,7 @@ const Settings = () => {
 
         <Link
           href="/"
-          className="underline underline-offset-8 mt-4 text-amber-400 hover:text-amber-300 active:text-amber-500"
+          className="underline underline-offset-8 mx-4 text-amber-400 hover:text-amber-300 active:text-amber-500"
         >
           Back
         </Link>
