@@ -6,15 +6,7 @@ import TextInput from "@/components/ui/TextInput";
 import Link from "next/link";
 import { useLocalStorage } from "@mantine/hooks";
 import DropdownInput from "@/components/ui/DropdownInput";
-
-interface AddModelProps {
-  tag: string;
-  revision: string;
-}
-
-interface RemoveModelProps {
-  tag: string;
-}
+import { AddModelProps, RemoveModelProps } from "@/types";
 
 const Settings = () => {
   const [models, setModels] = useState<object>({});

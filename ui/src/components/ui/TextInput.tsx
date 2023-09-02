@@ -1,10 +1,6 @@
-import { FC, HTMLAttributes } from "react";
+import { FC } from "react";
+import { TextInputProps } from "@/types";
 import { twMerge } from "tailwind-merge";
-
-interface TextInputProps extends HTMLAttributes<HTMLInputElement> {
-  state?: string;
-  setState?: (val: string | ((prevState: string) => string)) => void;
-}
 
 const TextInput: FC<TextInputProps> = ({
   className,

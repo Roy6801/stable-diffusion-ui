@@ -1,12 +1,8 @@
 "use client";
 
-import { FC, HTMLAttributes } from "react";
+import { FC } from "react";
 import { twMerge } from "tailwind-merge";
-
-interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
-  buttonColor?: string;
-  disabled?: boolean;
-}
+import { ButtonProps } from "@/types";
 
 const Button: FC<ButtonProps> = ({
   className,

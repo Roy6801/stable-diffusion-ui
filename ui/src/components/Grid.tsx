@@ -1,27 +1,7 @@
 import { IconSearch } from "@tabler/icons-react";
+import { ImageMapProps } from "@/types";
 
-interface Image {
-  path: string;
-  index: string;
-  gen_seed: number;
-  file_id_seed: number;
-  prompt: string;
-  negative_promot: string;
-  guidance_scale: number;
-  num_inference_steps: number;
-  aspect_ratio: string;
-  seed: number;
-  batch_size: number;
-  model: string;
-  scheduler: string;
-  encoded: string;
-}
-
-interface ImageMap {
-  [key: string]: Image;
-}
-
-const Grid = ({ images }: { images: ImageMap }) => {
+const Grid = ({ images }: { images: ImageMapProps }) => {
   return (
     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 scrollbar overflow-x-hidden p-2 my-2">
       {Object.keys(images).map((imageKey, index) => (

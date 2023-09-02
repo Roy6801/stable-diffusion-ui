@@ -1,9 +1,5 @@
-import {
-  createStyles,
-  SegmentedControl,
-  SegmentedControlProps,
-} from "@mantine/core";
-
+import { createStyles, SegmentedControl } from "@mantine/core";
+import { SegmentInputProps } from "@/types";
 import { twMerge } from "tailwind-merge";
 
 const useStyles = createStyles((theme) => ({
@@ -19,11 +15,6 @@ const useStyles = createStyles((theme) => ({
     },
   },
 }));
-
-interface SegmentInputProps extends SegmentedControlProps {
-  state?: string;
-  setState?: (val: string | ((prevState: string) => string)) => void;
-}
 
 const SegmentInput = ({
   data,

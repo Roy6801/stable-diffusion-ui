@@ -6,27 +6,7 @@ import { useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { reverseDate } from "@/utils/functions";
 import Grid from "@/components/Grid";
-
-interface Image {
-  path: string;
-  index: string;
-  gen_seed: number;
-  file_id_seed: number;
-  prompt: string;
-  negative_promot: string;
-  guidance_scale: number;
-  num_inference_steps: number;
-  aspect_ratio: string;
-  seed: number;
-  batch_size: number;
-  model: string;
-  scheduler: string;
-  encoded: string;
-}
-
-interface ImageMap {
-  [key: string]: Image;
-}
+import { ImageMapProps } from "@/types";
 
 const Gallery = () => {
   const [serverUrl] = useLocalStorage({
@@ -36,7 +16,7 @@ const Gallery = () => {
 
   const [current, setCurrent] = useState<string>("");
   const [dates, setDates] = useState<string[]>([]);
-  const [images, setImages] = useState<ImageMap>({});
+  const [images, setImages] = useState<ImageMapProps>({});
 
   const fetchDates = async (url: string) => {
     const data: string[] = await (
@@ -84,13 +64,13 @@ const Gallery = () => {
     (async () => {
       if (serverUrl !== "" && current !== "") {
         const url = serverUrl.replace("localhost", "127.0.0.1");
-        const all_images: ImageMap = (await fetchImages(
+        const all_images: ImageMapProps = (await fetchImages(
           `${url}/get_images?${new URLSearchParams({
             image_dir: "txt2img",
             date: current,
             desc: "true",
           })}`
-        )) as ImageMap;
+        )) as ImageMapProps;
 
         setImages(all_images);
       }
