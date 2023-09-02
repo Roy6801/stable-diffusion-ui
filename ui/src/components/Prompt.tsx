@@ -3,6 +3,8 @@ import TextArea from "./ui/TextArea";
 import Button from "./ui/Button";
 import { useLocalStorage } from "@mantine/hooks";
 import { getRandomInt } from "@/utils/functions";
+import { useState } from "react";
+import Loader from "./ui/Loader";
 
 interface PromptProps {
   className?: string;
@@ -20,6 +22,8 @@ interface Text2ImageProps {
 }
 
 const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [positivePrompt, setPositivePrompt] = useLocalStorage({
     key: "positive-prompt",
     defaultValue: "",
@@ -61,82 +65,96 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
   });
 
   const handleGenerate = async () => {
-    const url = serverUrl.replace("localhost", "127.0.0.1");
+    if (serverUrl !== "") {
+      const url = serverUrl.replace("localhost", "127.0.0.1");
 
-    const prompt: Text2ImageProps = {
-      prompt: positivePrompt,
-      negative_prompt: negativePrompt,
-      guidance_scale: guidance,
-      num_inference_steps: samples,
-      aspect_ratio: aspectRatio,
-      seed: seed,
-      batch_size: Number.parseInt(imageCount),
-    };
+      setLoading(true);
 
-    console.log(prompt);
+      const prompt: Text2ImageProps = {
+        prompt: positivePrompt,
+        negative_prompt: negativePrompt,
+        guidance_scale: guidance,
+        num_inference_steps: samples,
+        aspect_ratio: aspectRatio,
+        seed: seed,
+        batch_size: Number.parseInt(imageCount),
+      };
 
-    try {
-      const params = new URLSearchParams();
-      Object.entries(prompt).forEach(([key, value]) => {
-        params.append(key, String(value));
-      });
+      console.log(prompt);
 
-      const response = await fetch(`${url}/txt2img?${params}`, {
-        cache: "no-store",
-        headers: {
-          "ngrok-skip-browser-warning": "true",
-        },
-      });
+      try {
+        const params = new URLSearchParams();
+        Object.entries(prompt).forEach(([key, value]) => {
+          params.append(key, String(value));
+        });
 
-      if (response.body) {
-        const reader = response.body.getReader();
+        const response = await fetch(`${url}/txt2img?${params}`, {
+          cache: "no-store",
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        });
 
-        let data = "";
+        if (response.body) {
+          const reader = response.body.getReader();
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          data += new TextDecoder().decode(value);
+          let data = "";
 
-          if (data.includes("\n")) {
-            const [jsonObject, remainingData] = data.split("\n", 1);
-            const images = JSON.parse(jsonObject);
-            console.log(images);
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              setLoading(false);
+              break;
+            }
+            data += new TextDecoder().decode(value);
 
-            if (remainingData) data = remainingData;
-            else data = "";
-            setState(images);
+            if (data.includes("\n")) {
+              const [jsonObject, remainingData] = data.split("\n", 1);
+              const images = JSON.parse(jsonObject);
+
+              if (typeof images === "object" && !Array.isArray(images)) {
+                const { detail, status } = images;
+                console.log(status, detail);
+              }
+              if (remainingData) data = remainingData;
+              else data = "";
+              setState(images);
+            }
           }
         }
+        setSeed(getRandomInt(0, 99999999999));
+      } catch (error) {
+        console.log("Error fetching data:", error);
       }
-      setSeed(getRandomInt(0, 99999999999));
-    } catch (error) {
-      console.log("Error fetching data:", error);
     }
   };
 
   return (
     <main
       className={twMerge(
-        "flex flex-col lg:flex-row items-center justify-around p-5",
+        "flex flex-col md:flex-row items-center justify-around p-5",
         className
       )}
     >
+      {loading && <Loader text="Generating" />}
       <TextArea
-        className="w-full lg:w-2/5 m-2 min-h-[80px] text-md"
+        className="w-full lg:w-2/5 m-2 lg:min-h-[80px] text-md"
         placeholder="Prompt"
         maxHeight="200px"
         state={positivePrompt}
         setState={setPositivePrompt}
       />
       <TextArea
-        className="w-full lg:w-2/5 m-2 min-h-[80px] text-md"
+        className="w-full lg:w-2/5 m-2 lg:min-h-[80px] text-md"
         placeholder="Negative Prompt"
         maxHeight="200px"
         state={negativePrompt}
         setState={setNegativePrompt}
       />
-      <Button className="w-full lg:w-1/5 m-2" onClick={handleGenerate}>
+      <Button
+        className="w-full lg:w-1/5 m-2"
+        onClick={handleGenerate}
+      >
         Generate
       </Button>
     </main>

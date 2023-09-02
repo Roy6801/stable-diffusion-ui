@@ -19,7 +19,7 @@ const Loader = ({ text }: { text: boolean | string }) => {
 
   return (
     <div className="absolute z-10 top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center">
-      <span className="text-4xl font-black font-mono">
+      <span className="text-4xl text-amber-400 font-black font-mono">
         {text ? text : "Loading"}
         {symbol[count]}
       </span>

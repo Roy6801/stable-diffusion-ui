@@ -9,8 +9,8 @@ class LoadModel(Resource):
 
     async def post(self, data: LoadModelParams):
         try:
-            load_model(self.__shared_context, data.tag)
-            return data.tag
+            tag = load_model(self.__shared_context, data.tag)
+            return tag
         except Exception as e:
             raise HTTPException(500, str(e))
 
@@ -29,6 +29,9 @@ auth_token = os.getenv("HUGGINGFACE_AUTH_TOKEN")
 
 def load_model(shared_context, tag: str):
     tag = tag.lower().strip()
+
+    if tag == shared_context["tag"]:
+        return tag
 
     config = shared_context["config"]
 

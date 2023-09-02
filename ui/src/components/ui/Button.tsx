@@ -5,16 +5,19 @@ import { twMerge } from "tailwind-merge";
 
 interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   buttonColor?: string;
+  disabled?: boolean;
 }
 
 const Button: FC<ButtonProps> = ({
   className,
   buttonColor = "bg-zinc-900",
+  disabled = false,
   children,
   ...props
 }) => {
   return (
     <button
+      disabled={disabled}
       className={twMerge(
         "rounded-sm active:scale-75 duration-150 text-sm text-amber-200 hover:text-black font-semibold bg-gradient-to-br hover:bg-gradient-to-tl from-amber-500 to-amber-200 p-[1px]",
         className

@@ -144,7 +144,6 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         .then((res) => res.json())
         .then((res) => {
           console.log(res);
-          setModel("");
         })
         .catch((err) => {
           console.log(err);
