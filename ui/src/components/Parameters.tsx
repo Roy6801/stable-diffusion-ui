@@ -10,24 +10,13 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getRandomInt } from "@/utils/functions";
 import Loader from "./ui/Loader";
-
-interface ModelInfo {
-  revision: string;
-  model_name: string;
-  author: string;
-  identifier: string;
-  downloaded: boolean;
-}
-
-interface ModelMap {
-  [key: string]: ModelInfo;
-}
+import { ModelMapProps } from "@/types";
 
 const Parameters = ({ className = "" }: { className?: string }) => {
   const [model, setModel] = useState<string>("");
   const [scheduler, setScheduler] = useState<string>("");
 
-  const [models, setModels] = useState<ModelMap>({});
+  const [models, setModels] = useState<ModelMapProps>({});
   const [schedulers, setSchedulers] = useState<object>({});
 
   const [loader, setLoader] = useState<boolean | string>(false);

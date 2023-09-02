@@ -1,11 +1,6 @@
-import { FC, HTMLAttributes, useEffect, useState, ChangeEvent } from "react";
+import { FC, useEffect, ChangeEvent } from "react";
+import { TextAreaProps } from "@/types";
 import { twMerge } from "tailwind-merge";
-
-interface TextAreaProps extends HTMLAttributes<HTMLTextAreaElement> {
-  maxHeight?: string;
-  state?: string;
-  setState?: (val: string | ((prevState: string) => string)) => void;
-}
 
 const TextArea: FC<TextAreaProps> = ({
   className,

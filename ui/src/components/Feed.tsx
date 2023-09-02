@@ -1,9 +1,5 @@
 import { twMerge } from "tailwind-merge";
-
-interface FeedProps {
-  className?: string;
-  state?: string[];
-}
+import { FeedProps } from "@/types";
 
 const Feed = ({ className = "", state = [] }: FeedProps) => {
   return (

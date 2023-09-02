@@ -3,14 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { twMerge } from "tailwind-merge";
-
-interface DropdownProps {
-  data: string[];
-  placeholder: string;
-  state?: string;
-  setState?: (val: string | ((prevState: string) => string)) => void;
-  className?: string;
-}
+import { DropdownProps } from "@/types";
 
 const DropdownInput = ({
   data,

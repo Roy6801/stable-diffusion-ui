@@ -5,21 +5,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { getRandomInt } from "@/utils/functions";
 import { useState } from "react";
 import Loader from "./ui/Loader";
-
-interface PromptProps {
-  className?: string;
-  setState?: (val: string[] | ((prevState: string[]) => string[])) => void;
-}
-
-interface Text2ImageProps {
-  prompt: string;
-  negative_prompt: string;
-  guidance_scale: number;
-  num_inference_steps: number;
-  aspect_ratio: string;
-  seed: number;
-  batch_size: number;
-}
+import { PromptProps, Text2ImageProps } from "@/types";
 
 const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -151,10 +137,7 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
         state={negativePrompt}
         setState={setNegativePrompt}
       />
-      <Button
-        className="w-full lg:w-1/5 m-2"
-        onClick={handleGenerate}
-      >
+      <Button className="w-full lg:w-1/5 m-2" onClick={handleGenerate}>
         Generate
       </Button>
     </main>

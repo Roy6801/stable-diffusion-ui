@@ -1,17 +1,6 @@
 import { NumberInput, Slider } from "@mantine/core";
+import { SliderProps } from "@/types";
 import { twMerge } from "tailwind-merge";
-
-interface SliderProps {
-  defaultValue: number;
-  min: number;
-  max: number;
-  step: number;
-  label: string;
-  placeholder: string;
-  state?: number;
-  setState?: (val: number | ((prevState: number) => number)) => void;
-  className?: string;
-}
 
 const SliderInput = ({
   defaultValue = 20,
