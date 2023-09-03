@@ -84,7 +84,7 @@ def txt2img(
     shared_context: dict,
     queue: Queue,
     prompt: str,
-    negative_prompt: str,
+    negative_prompt: str = "nsfw",
     guidance_scale: int = 7,
     num_inference_steps: int = 50,
     aspect_ratio: str = "1:1",
