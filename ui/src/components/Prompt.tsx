@@ -96,15 +96,23 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
 
             if (data.includes("\n")) {
               const [jsonObject, remainingData] = data.split("\n", 1);
-              const images = JSON.parse(jsonObject);
+              try {
+                const images = JSON.parse(jsonObject);
+                console.log(images); // Process the parsed object
 
-              if (typeof images === "object" && !Array.isArray(images)) {
-                const { detail, status } = images;
-                console.log(status, detail);
+                if (typeof images === "object" && !Array.isArray(images)) {
+                  const { detail, status } = images;
+                  console.log(status, detail);
+                }
+
+                setState(images);
+              } catch (error) {
+                console.error("JSON parsing error:", error);
+                // Handle the error, e.g., skip the problematic data
               }
+
               if (remainingData) data = remainingData;
               else data = "";
-              setState(images);
             }
           }
         }
