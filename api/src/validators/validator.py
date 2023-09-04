@@ -34,4 +34,3 @@ class ImageParams(BaseModel):
     model: str
     revision: str
     scheduler: str
-    encoded: str

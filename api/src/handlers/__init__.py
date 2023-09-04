@@ -6,4 +6,5 @@ from .load_model import LoadModel
 from .load_scheduler import LoadScheduler
 from .txt2img import Txt2Img
 from .get_dates import GetDates
-from .get_images import GetImages
+from .list_images import ListImages
+from .get_image import GetImage

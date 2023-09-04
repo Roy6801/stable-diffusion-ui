@@ -2,6 +2,7 @@ interface ImageProps {
   path: string;
   index: string;
   gen_seed: number;
+  file_id: string;
   file_id_seed: number;
   prompt: string;
   negative_prompt: string;

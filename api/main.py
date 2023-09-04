@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_restful import Api
 from src.handlers import *
@@ -36,26 +35,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-import time
-
-
-def async_data_generator():
-    for data_item in [
-        {"key": "value1"},
-        {"key": "value2"},
-        {"key": "value3"},
-        {"key": "value4"},
-        {"key": "value5"},
-        {"key": "value6"},
-    ]:
-        time.sleep(1)
-        yield json.dumps(data_item) + "\n"
-
-
-@app.get("/stream_test")
-async def async_stream_response():
-    return StreamingResponse(async_data_generator(), media_type="application/json")
-
 
 api = Api(app)
 
@@ -70,7 +49,8 @@ load_model_ = LoadModel(shared_context)
 load_scheduler_ = LoadScheduler(shared_context)
 txt2img_ = Txt2Img(shared_context)
 get_dates_ = GetDates()
-get_images_ = GetImages()
+list_images_ = ListImages()
+get_image_ = GetImage()
 
 
 # add resource models to api endpoints
@@ -83,4 +63,5 @@ api.add_resource(load_model_, "/load_model")
 api.add_resource(load_scheduler_, "/load_scheduler")
 api.add_resource(txt2img_, "/txt2img")
 api.add_resource(get_dates_, "/get_dates")
-api.add_resource(get_images_, "/get_images")
+api.add_resource(list_images_, "/list_images")
+api.add_resource(get_image_, "/get_image")

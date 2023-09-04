@@ -1,44 +1,72 @@
-import { useState, useRef } from "react";
-import { IconSearch } from "@tabler/icons-react";
-import { ImageMapProps } from "@/types";
+import { useState, useEffect } from "react";
 import PromptDetail from "./PromptDetail";
-import { ImageProps } from "@/types";
+import GridImage from "./GridImage";
+import { Loader } from "@mantine/core";
+import { GridProps } from "@/types";
 
-const Grid = ({ images }: { images: ImageMapProps }) => {
+const Grid = ({ images, infinite, loading }: GridProps) => {
   const [opened, setOpened] = useState<boolean>(false);
-  const imageRef = useRef<ImageProps>();
+  const [index, setIndex] = useState<number>(0);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowLeft":
+          setPrev();
+          break;
+        case "ArrowRight":
+          setNext();
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [index]);
+
+  const setNext = () => {
+    if (index < images.length - 1)
+      setIndex((prevIndex: number) => prevIndex + 1);
+  };
+
+  const setPrev = () => {
+    if (index > 0) setIndex((prevIndex: number) => prevIndex - 1);
+  };
 
   return (
-    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 scrollbar overflow-x-hidden p-2 my-2">
-      {opened && (
-        <PromptDetail
-          onClose={() => setOpened(false)}
-          image={imageRef.current}
-        />
-      )}
-      {Object.keys(images).map((imageKey, index) => (
-        <div
-          key={index}
-          onClick={(e) => {
-            imageRef.current = images[imageKey];
-            setOpened(true);
-          }}
-          className="relative group bg-zinc-800 p-2 hover:p-0 m-1 flex items-center justify-center rounded-md h-[256px] hover:scale-105 duration-300"
-        >
-          <div className="absolute inset-0 group-hover:bg-black/30 flex items-center justify-center">
-            <IconSearch
-              size={36}
-              stroke={3}
-              color="orange"
-              className="hidden group-hover:flex"
-            />
-          </div>
-          <img
-            className="object-cover w-full h-full rounded-md"
-            src={`data:image/png;base64,${images[imageKey]["encoded"]}`}
+    <div className="flex-1 scrollbar overflow-x-hidden">
+      <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-2 my-2">
+        {opened && (
+          <PromptDetail
+            onClose={() => setOpened(false)}
+            images={images}
+            imageIndex={index}
+            setNext={setNext}
+            setPrev={setPrev}
           />
-        </div>
-      ))}
+        )}
+        {images.map((image, ind) => (
+          <GridImage
+            onClick={() => {
+              setIndex(ind);
+              setOpened(true);
+            }}
+            key={`${image.file_id}`}
+            image={image}
+          />
+        ))}
+      </div>
+      <div
+        className="w-full h-10 flex items-center justify-center"
+        ref={infinite}
+      >
+        {loading && <Loader color="yellow" size="xl" />}
+      </div>
     </div>
   );
 };

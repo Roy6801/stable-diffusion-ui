@@ -1,4 +1,4 @@
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, LegacyRef } from "react";
 import { SegmentedControlProps } from "@mantine/core";
 import { ImageProps } from ".";
 
@@ -42,9 +42,32 @@ interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   disabled?: boolean;
 }
 
+interface ArrowButtonProps extends HTMLAttributes<HTMLButtonElement> {
+  direction: "right" | "left" | "up" | "down";
+}
+
 interface PromptDetailProps {
   onClose: () => void;
-  image: ImageProps | undefined;
+  imageIndex: number;
+  images: ImageProps[];
+  setNext: () => void;
+  setPrev: () => void;
+}
+
+interface GalleryProps {
+  serverUrl: string;
+  date: string;
+}
+
+interface GridProps {
+  images: ImageProps[];
+  infinite: LegacyRef<HTMLDivElement> | undefined;
+  loading: boolean;
+}
+
+interface GridImageProps {
+  image: ImageProps;
+  onClick: () => void;
 }
 
 export type {
@@ -54,5 +77,9 @@ export type {
   SegmentInputProps,
   DropdownProps,
   ButtonProps,
+  ArrowButtonProps,
   PromptDetailProps,
+  GalleryProps,
+  GridProps,
+  GridImageProps,
 };

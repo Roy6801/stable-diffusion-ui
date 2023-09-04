@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IconX, IconMaximize } from "@tabler/icons-react";
 import { PromptDetailProps } from "@/types";
 import ImageView from "./ImageView";
+import ArrowButton from "./ui/ArrowButton";
 
 const dimensions: { [key: string]: number[] } = {
   "1:1": [512, 512],
@@ -9,12 +10,34 @@ const dimensions: { [key: string]: number[] } = {
   "2:3": [512, 768],
 };
 
-const PromptDetail = ({ image, onClose }: PromptDetailProps) => {
+const PromptDetail = ({
+  images,
+  imageIndex,
+  onClose,
+  setNext,
+  setPrev,
+}: PromptDetailProps) => {
   const [opened, setOpened] = useState<boolean>(false);
+  const image = images[imageIndex];
 
   return (
     <div className="absolute inset-0 bg-transparent z-10 flex items-center justify-center backdrop-blur-lg overflow-hidden">
-      {opened && <ImageView image={image} onClose={() => setOpened(false)} />}
+      {opened && (
+        <ImageView
+          images={images}
+          imageIndex={imageIndex}
+          onClose={() => setOpened(false)}
+          setNext={setNext}
+          setPrev={setPrev}
+        />
+      )}
+
+      <ArrowButton
+        direction="left"
+        className="absolute top-1/2 left-0 w-16 h-10"
+        onClick={setPrev}
+      />
+
       <div className="w-screen h-full md:w-11/12 md:h-5/6 flex flex-col md:flex-row rounded-lg scrollbar overflow-hidden">
         <div
           className="relative group w-full md:w-1/2 flex items-center justify-center p-2 bg-zinc-900"
@@ -99,6 +122,12 @@ const PromptDetail = ({ image, onClose }: PromptDetailProps) => {
           </div>
         </div>
       </div>
+
+      <ArrowButton
+        direction="right"
+        className="absolute top-1/2 right-0 w-16 h-10"
+        onClick={setNext}
+      />
     </div>
   );
 };
