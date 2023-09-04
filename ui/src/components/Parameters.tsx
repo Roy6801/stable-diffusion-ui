@@ -9,7 +9,7 @@ import Button from "./ui/Button";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getRandomInt } from "@/utils/functions";
-import Loader from "./ui/Loader";
+import ApiLoader from "./ui/ApiLoader";
 import { ModelMapProps } from "@/types";
 
 const Parameters = ({ className = "" }: { className?: string }) => {
@@ -147,7 +147,7 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         className
       )}
     >
-      {loader && <Loader text={loader} />}
+      {loader && <ApiLoader text={loader} />}
       <TextInput
         placeholder="Server URL"
         className="w-full md:w-3/4 lg:w-full mt-4 text-md py-6"

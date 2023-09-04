@@ -4,7 +4,7 @@ import Button from "./ui/Button";
 import { useLocalStorage } from "@mantine/hooks";
 import { getRandomInt } from "@/utils/functions";
 import { useState } from "react";
-import Loader from "./ui/Loader";
+import ApiLoader from "./ui/ApiLoader";
 import { PromptProps, Text2ImageProps } from "@/types";
 
 const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
@@ -130,7 +130,7 @@ const Prompt = ({ className = "", setState = () => {} }: PromptProps) => {
         className
       )}
     >
-      {loading && <Loader text="Generating" />}
+      {loading && <ApiLoader text="Generating" />}
       <TextArea
         className="w-full lg:w-2/5 m-2 lg:min-h-[80px] text-md"
         placeholder="Prompt"

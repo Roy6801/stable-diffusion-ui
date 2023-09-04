@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 const symbol: string[] = ["", ".", "..", "..."];
 
-const Loader = ({ text }: { text: boolean | string }) => {
+const ApiLoader = ({ text }: { text: boolean | string }) => {
   const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
@@ -27,4 +27,4 @@ const Loader = ({ text }: { text: boolean | string }) => {
   );
 };
 
-export default Loader;
+export default ApiLoader;
