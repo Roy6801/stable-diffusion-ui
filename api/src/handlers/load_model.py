@@ -46,7 +46,7 @@ def load_model(shared_context, tag: str):
             revision=revision,
             torch_dtype=torch.float16,
             use_auth_token=auth_token,
-            cache_dir="models",
+            cache_dir=MODEL_DIR,
             safety_checker=None,
         )
 
