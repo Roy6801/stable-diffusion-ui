@@ -5,7 +5,7 @@ load_dotenv(find_dotenv())
 
 __root_dir = "."
 __root_image_dir = os.getenv("CUSTOM_IMAGE_DIR_PATH", __root_dir)
-__root_model_dir = os.getenv("CUSTOM_IMAGE_MODEL_PATH", __root_dir)
+__root_model_dir = os.getenv("CUSTOM_MODEL_DIR_PATH", __root_dir)
 
 
 IMAGE_DIR = os.path.join(__root_image_dir, "images")
