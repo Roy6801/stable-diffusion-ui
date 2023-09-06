@@ -15,7 +15,7 @@ class AddModel(Resource):
             raise HTTPException(500, str(e))
 
 
-from ..utils import CONFIG_FILE
+from ..utils.functions import save_config
 import json
 
 
@@ -40,8 +40,7 @@ def add_model(shared_context, tag: str, revision: str = "fp16"):
                 "identifier": identifier,
                 "downloaded": False,
             }
-            with open(CONFIG_FILE, "w") as fw:
-                json.dump(config, fw, indent=2)
+            save_config(config)
         except:
             raise Exception("Failed to add to Config!")
     else:
