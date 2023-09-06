@@ -7,7 +7,7 @@
 api/**/__pycache__
 api/images
 api/models
-api/src/config.json
+api/config.json
 
 ## UI
 
