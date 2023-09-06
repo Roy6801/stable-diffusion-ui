@@ -16,3 +16,6 @@ TXT_2_IMG_LOG = "data.json"
 MODEL_DIR = os.path.join(__root_model_dir, "models")
 SRC_DIR = os.path.join(__root_dir, "src")
 CONFIG_FILE = os.path.join(SRC_DIR, "config.json")
+
+print("Image Directory:", IMAGE_DIR)
+print("Model Directory:", MODEL_DIR)
