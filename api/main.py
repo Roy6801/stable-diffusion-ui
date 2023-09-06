@@ -1,14 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_restful import Api
+from src.utils.functions import verify_config
 from src.handlers import *
-from src.utils import CONFIG_FILE
-import json
 
 
 try:
-    with open(CONFIG_FILE, "r") as fr:
-        config = json.load(fr)
+    config = verify_config()
 except:
     raise Exception("Config File could not be loaded!")
 

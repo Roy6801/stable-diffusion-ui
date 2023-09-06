@@ -17,9 +17,9 @@ class LoadModel(Resource):
 
 from diffusers import StableDiffusionPipeline
 from dotenv import find_dotenv, load_dotenv
-from ..utils import CONFIG_FILE, MODEL_DIR
+from ..utils.functions import save_config
+from ..utils import MODEL_DIR
 import torch
-import json
 import os
 
 
@@ -60,8 +60,7 @@ def load_model(shared_context, tag: str):
             os.path.join(MODEL_DIR, identifier)
         ):
             config["models"][tag]["downloaded"] = True
-            with open(CONFIG_FILE, "w") as fw:
-                json.dump(config, fw, indent=2)
+            save_config(config)
 
         return tag
     else:
