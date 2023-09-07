@@ -10,7 +10,12 @@ def verify_config() -> dict:
     base_config = json.load(fr)
     fr.close()
 
-    if os.path.exists(CONFIG_FILE):
+    parent_dir = os.path.dirname(CONFIG_FILE)
+
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
+
+    elif os.path.exists(CONFIG_FILE):
         config_data = load_config()
         if (
             isinstance(config_data["models"], dict)
