@@ -5,7 +5,7 @@
 
 <br />
 
-## Insights/ Features
+> ## Insights/ Features
 
 - ### Simple UI for Prompt-based Image Generation.
 - ### Supports Negative Prompting.
@@ -17,7 +17,21 @@
 
 <br />
 
-## Usage (Follow either one)
+> ## How to Use?
+
+### Know the Environment Variables
+
+| Variable Name          | Use                                                                     | Required/Optional                  |
+| ---------------------- | ----------------------------------------------------------------------- | ---------------------------------- |
+| HUGGINGFACE_AUTH_TOKEN | Using/Downloading HuggingFace Models                                    | **Required**                       |
+| NGROK_AUTH_TOKEN       | To run your own server online                                           | Optional (If using Online Version) |
+| CUSTOM_IMAGE_DIR_PATH  | Set a Directory where the Images will be stored                         | Optional (Default = /api)          |
+| CUSTOM_MODEL_DIR_PATH  | Set a Directory where the Models will be downloaded and loaded from     | Optional (Default = /api)          |
+| CUSTOM_CONFIG_DIR_PATH | Set a Directory for loading Config File that stores all functional data | Optional (Default = /api)          |
+
+<br />
+
+## Follow Either One
 
 ### 1. Run Locally on Your PC
 
@@ -48,5 +62,7 @@
 - **Visit Diffuser-UI Website! (https://diffuser-ui.vercel.app)**
 
   - **Set the Server URL to the URL that will be generated in the Colab.**
+
+<br />
 
 ### ✨🎉 Happy Prompting! 🎉🥳
