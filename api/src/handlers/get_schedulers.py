@@ -14,4 +14,6 @@ class GetSchedulers(Resource):
 
 
 def get_schedulers(shared_context):
-    return shared_context["config"]["scheduler"]["models"]
+    schedulers = shared_context["config"]["scheduler"]["models"]
+    active = shared_context["scheduler_id"]
+    return {"active": active, "schedulers": schedulers}
