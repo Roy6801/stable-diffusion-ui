@@ -5,19 +5,19 @@
 
 <br />
 
-> ## Insights/ Features
+## Insights/ Features
 
-- ### Simple UI for Prompt-based Image Generation.
-- ### Supports Negative Prompting.
-- ### Add any Model Tag and Revision (Branch Name) from HuggingFace to generate Images.
+- **Simple UI for Prompt-based Image Generation.**
+- **Supports Negative Prompting.**
+- **Add any Model Tag and Revision (Branch Name) from HuggingFace to generate Images.**
 
-- ### Switch between different Schedulers for Generation.
+- **Switch between different Schedulers for Generation.**
 
-- ### Select Number of Images and Aspect Ratio as per your choice.
+- **Select Number of Images and Aspect Ratio as per your choice.**
 
 <br />
 
-> ## How to Use?
+## How to Use?
 
 ### Know the Environment Variables
 
