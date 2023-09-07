@@ -14,4 +14,6 @@ class GetModels(Resource):
 
 
 def get_models(shared_context):
-    return shared_context["config"]["models"]
+    models = shared_context["config"]["models"]
+    active = shared_context["tag"]
+    return {"active": active, "models": models}

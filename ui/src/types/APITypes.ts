@@ -33,4 +33,15 @@ interface ModelMapProps {
   [key: string]: ModelProps;
 }
 
-export type { ImageProps, ImageMapProps, ModelProps, ModelMapProps };
+interface ModelAPIProps {
+  active: string;
+  models: ModelMapProps;
+}
+
+export type {
+  ImageProps,
+  ImageMapProps,
+  ModelProps,
+  ModelMapProps,
+  ModelAPIProps,
+};

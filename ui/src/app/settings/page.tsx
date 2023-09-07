@@ -6,10 +6,15 @@ import TextInput from "@/components/ui/TextInput";
 import Link from "next/link";
 import { useLocalStorage } from "@mantine/hooks";
 import DropdownInput from "@/components/ui/DropdownInput";
-import { AddModelProps, RemoveModelProps } from "@/types";
+import {
+  AddModelProps,
+  RemoveModelProps,
+  ModelMapProps,
+  ModelAPIProps,
+} from "@/types";
 
 const Settings = () => {
-  const [models, setModels] = useState<object>({});
+  const [models, setModels] = useState<ModelMapProps>({});
 
   const [addModel, setAddModel] = useLocalStorage({
     key: "add-model",
@@ -42,8 +47,8 @@ const Settings = () => {
         },
       })
         .then((res) => res.json())
-        .then((res) => {
-          setModels(res);
+        .then((res: ModelAPIProps) => {
+          setModels(res.models);
         })
         .catch((err) => {
           console.log(err);
@@ -77,6 +82,8 @@ const Settings = () => {
       console.log(added);
 
       fetchModels();
+      setAddModel("");
+      setModelRevision("");
     }
   };
 

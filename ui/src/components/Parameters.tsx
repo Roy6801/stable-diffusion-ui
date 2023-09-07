@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getRandomInt } from "@/utils/functions";
 import ApiLoader from "./ui/ApiLoader";
-import { ModelMapProps } from "@/types";
+import { ModelMapProps, ModelAPIProps } from "@/types";
 
 const Parameters = ({ className = "" }: { className?: string }) => {
   const [model, setModel] = useState<string>("");
@@ -62,8 +62,9 @@ const Parameters = ({ className = "" }: { className?: string }) => {
         },
       })
         .then((res) => res.json())
-        .then((res) => {
-          setModels(res);
+        .then((res: ModelAPIProps) => {
+          setModel(res.active);
+          setModels(res.models);
         })
         .catch((err) => {
           console.log(err);
@@ -79,7 +80,8 @@ const Parameters = ({ className = "" }: { className?: string }) => {
       })
         .then((res) => res.json())
         .then((res) => {
-          setSchedulers(res);
+          setScheduler(res["active"].toUpperCase());
+          setSchedulers(res["schedulers"]);
           setLoader(false);
         })
         .catch((err) => {
