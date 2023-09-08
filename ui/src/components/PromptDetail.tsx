@@ -34,13 +34,13 @@ const PromptDetail = ({
 
       <ArrowButton
         direction="left"
-        className="absolute top-1/2 left-0 w-16 h-10"
+        className="absolute top-1/2 left-0 w-16 h-10 z-30"
         onClick={setPrev}
       />
 
       <div className="w-screen h-full md:w-11/12 md:h-5/6 flex flex-col md:flex-row rounded-lg scrollbar overflow-hidden">
         <div
-          className="relative group w-full md:w-1/2 flex items-center justify-center p-2 bg-zinc-900"
+          className="relative group w-full md:w-1/2 h-1/2 md:h-full flex items-center justify-center p-2 bg-zinc-900 md:bg-gradient-to-bl md:from-zinc-900 md:to-zinc-950"
           onClick={(e) => setOpened(true)}
         >
           <div className="absolute inset-0 group-hover:bg-black/10">
@@ -60,11 +60,11 @@ const PromptDetail = ({
           </div>
           <img
             src={`data:image/png;base64,${image?.encoded}`}
-            className="object-contain w-full rounded-md"
+            className="object-contain w-full h-full rounded-md"
           />
         </div>
 
-        <div className="bg-zinc-800 w-full h-full md:w-1/2 flex flex-col p-5 text-lg text-amber-400 font-mono font-bold scrollbar">
+        <div className="bg-zinc-800 w-full md:w-1/2 h-1/2 md:h-full flex flex-col p-5 text-lg text-amber-400 font-mono font-bold scrollbar">
           <IconX
             onClick={onClose}
             size={28}
@@ -125,7 +125,7 @@ const PromptDetail = ({
 
       <ArrowButton
         direction="right"
-        className="absolute top-1/2 right-0 w-16 h-10"
+        className="absolute top-1/2 right-0 w-16 h-10 z-30"
         onClick={setNext}
       />
     </div>
