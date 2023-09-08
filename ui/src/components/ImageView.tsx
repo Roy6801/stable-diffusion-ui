@@ -22,7 +22,7 @@ const ImageView = ({
 
       <ArrowButton
         direction="left"
-        className="absolute top-1/2 left-0 w-16 h-10"
+        className="absolute top-1/2 left-0 w-16 h-10 z-30"
         onClick={setPrev}
       />
 
@@ -33,7 +33,7 @@ const ImageView = ({
 
       <ArrowButton
         direction="right"
-        className="absolute top-1/2 right-0 w-16 h-10"
+        className="absolute top-1/2 right-0 w-16 h-10 z-30"
         onClick={setNext}
       />
     </div>
