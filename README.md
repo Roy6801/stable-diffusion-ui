@@ -1,5 +1,11 @@
 # Stable-Diffusion-UI
 
+<br />
+
+![Prompt Generations](https://github.com/Roy6801/stable-diffusion-ui/blob/main/examples/diffuser_ui.png?raw=true)
+
+<br />
+
 - ### Website - https://diffuser-ui.vercel.app
 - ### Google Colab Server - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Roy6801/stable-diffusion-ui/)
 
